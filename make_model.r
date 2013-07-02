@@ -9,8 +9,8 @@ library(igraph)
 ############### Defined Functions ###############
 #################################################
 
-makeSWPNetwork <- function(nodeCount){
-g <- watts.strogatz.game(1,nodeCount,2,.5, loops = FALSE, multiple = FALSE)
+makeSWPNetwork <- function(dim,nodeCount){
+g <- watts.strogatz.game(dim,nodeCount,2,.5, loops = FALSE, multiple = FALSE)
 return(g)
 }
 
@@ -20,10 +20,11 @@ return(g)
 #################################################
 
 ## Model Parameters
+dim       = 1
 nodeCount = 25
 
 ## Execute
-swpGraph = makeSWPNetwork(nodeCount)
+swpGraph = makeSWPNetwork(dim,nodeCount)
 
 ## Plot
 png(file="SWP_plot1.png")
