@@ -44,11 +44,22 @@ It has been observed that for intermediate levels of randomness ( 0 < p < 1),  n
 \subsection{Measures of Small-word Networks}
 \par
 As stated previously, there are many properties of networks which help to define the network's  structure and characteristic traits. Since small-world networks are defined as having a short average path-length with a characteristic high clustering coefficient, measures that assess the level of 'small-worldness' of a network should be based off of these two properties. One such measure is the network measurement 'S', devised by Mark D. Humphries \& Kevin Gurney (2008).  This measure has two forms, Sws  and S(delta), where Sws  uses the clustering coefficient defined by Watts \& Strogatz (1998), and Sws  uses another definition of network clustering based on transitivity that is often used for small world models. (Newman, Moore, \& Watts, 2000). 
-\subsection{Calculating  Sws}
+\subsection{Calculating  $S^{WS}$}
 \par
-For simplicity, in the following description I will refer to Sws  as simply S. The quantitative metric of 'small-world-ness' (S) is defined by the equation: ** Figures** 
+The quantitative metric of 'small-world-ness' ($S^{WS}$) is defined by combining the two equations:
+\begin{eqnarray}
+\gamma_g^{WS} = \frac{C_g^{WS}}{C_{rand}^{WS}}
+\end{eqnarray}
+and
+\begin{eqnarray}
+\lambda_g = \frac{L_g}{L_{rand}}
+\end{eqnarray}
+To generate the deffination:
+\begin{eqnarray}
+S^{WS} = \frac{\gamma_g^{WS}}{\lambda_g}
+\end{eqnarray}
 \par
-Where,**Add Figures** and Given a network G with n nodes and m edges, the value of S is calculated by comparing the clustering coefficient, CWS  ( the extent to which the neighbors of nodes are interconnected), and the mean minimal path-length over all node pairs, L, between G and an equivalent Erdös-Rényi (E-R) random graph with the same n and m. If the resultant S value is greater than 1 (S > 1), network G is considered a small-word network. The higher the S value, the higher the attributed 'small-world-ness'. (Humphries \& Gurney, 2008)
+Given a network G with n nodes and m edges, the value of $S^{WS}$ is calculated by comparing the clustering coefficient, $C^{WS}$  ( the extent to which the neighbors of nodes are interconnected), and the mean minimal path-length over all node pairs, L, between G and an equivalent Erdös-Rényi (E-R) random graph with the same n and m. If the resultant S value is greater than 1 (S > 1), network G is considered a small-word network. The higher the S value, the higher the attributed 'small-world-ness'. (Humphries \& Gurney, 2008)
 \subsection{Networks in the Brain}
 \par
 Networks arise everywhere in nature, especially in biological systems (McVittie, 2010). One particular system often analyzed is the brain, the epitome of biological networks. Analysis of brain networks is used most often in research regarding the structural or functional connectivity of the brain. Structural connectivity in the brain is the actually physical connectivity between neurons through axonal and dendritic connections. Functional connectivity on the other hand is the temporal pathway of activity which occurs in coordination with given task being completed. For example, while there are billions of physical, structural pathways leading from the retina to the rest of the brain, the functional pathway is the specific connections which show activity when one's eyes fixate on a specific stimulus. At this time we actually have more data on functional connectivity of the brain than structural connectivity because the techniques to determine large scale structural connection have just recently become available. While it is known that functional connectivity can, and often does, differ from the structural connectivity, it is not fully understood why or how this happens and current research aims to uncover how functional connectivity emerges within a structural network (Hlinka et al., 2012). Recent publications have shown that structural connectivity, and even functional connectivity, often exhibit small-world properties in humans (Bassett \& Bullmore, 2006).
