@@ -1,7 +1,7 @@
 ## Ryan Himmelwright
 ## Honors Thesis
 ## Make Model Script
-## 7/7/13
+## 8/27/2013
 
 library(igraph)
 
@@ -36,6 +36,11 @@ makeRandNetwork <- function(dim, size, swpGraph){
     print("Degree:")
     print(degree(randGraph))
 return(randGraph)
+}
+
+# Calculate S^delta
+calc_Selta <- function(swpGraph, randGraph){
+    
 }
 
 #################################################
