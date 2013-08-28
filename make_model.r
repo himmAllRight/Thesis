@@ -1,7 +1,7 @@
 ## Ryan Himmelwright
 ## Honors Thesis
 ## Make Model Script
-## 8/27/2013
+## 8/28/2013
 
 library(igraph)
 
@@ -39,8 +39,21 @@ return(randGraph)
 }
 
 # Calculate S^delta
-calc_Selta <- function(swpGraph, randGraph){
+calc_Sdelta <- function(swpGraph, randGraph){
+    # Calculate LamdaG (LamdaG = Lg / Lrand)
+    Lg     = average.path.length(swpGraph, directed = FALSE)
+    Lrand  = average.path.length(randGraph, directed = FALSE)
+    LamdaG = ( Lg / Lrand )
     
+    print("Lamda G")
+    print(Lg)
+    print(Lrand)
+    print(LamdaG)
+    
+    
+    # Calculate GammaDeltaG ( GammaDeltaG = cDeltaG / cDeltaRand )
+    
+    # Find a way to determine the number of triangles in a graph. ( and number of paths of length 2?)  
 }
 
 #################################################
@@ -57,6 +70,7 @@ p         = .5  # the rewiring probabillity
 ## Execute
 swpGraph = makeSWPNetwork(dim,size,nei,p)
 randGraph = makeRandNetwork(dim, size, swpGraph)
+Sdelta = calc_Sdelta(swpGraph, randGraph)
 ## Plot
 png(file="SWP_plot1.png")
 plot(swpGraph)
