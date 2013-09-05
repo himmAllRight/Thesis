@@ -38,6 +38,17 @@ makeRandNetwork <- function(dim, size, swpGraph){
 return(randGraph)
 }
 
+# Finds the hubs of a network.
+findHubs <- function(swpGraph){
+    print("hub scores")
+    hubMatrix = hub.score(swpGraph) # !! need to only get matrix from this
+    print(hubMatrix)
+
+    # Once we have a matrix of the hubs, add a for loop to change each one
+    # to a defining color such as red, and return the graph so it can be printed
+    # with the others.
+}
+
 # Might forget about this for a bit to focus on more important parts of the model.
 # It might slow things down alot if I code it by myself by hand. (high complexity)
 # Calculate S^delta
@@ -76,7 +87,9 @@ p         = .5  # the rewiring probabillity
 ## Execute
 swpGraph = makeSWPNetwork(dim,size,nei,p)
 randGraph = makeRandNetwork(dim, size, swpGraph)
-Sdelta = calc_Sdelta(swpGraph, randGraph)
+#Sdelta = calc_Sdelta(swpGraph, randGraph)
+hubs = findHubs(swpGraph)
+
 ## Plot
 png(file="SWP_plot1.png")
 plot(swpGraph)
