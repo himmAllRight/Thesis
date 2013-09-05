@@ -27,7 +27,7 @@ return(swpGraph)
 # Function to Generate an Erdos-Renyi random graph
 makeRandNetwork <- function(dim, size, swpGraph){
     randGraph <- erdos.renyi.game((size^dim), ecount(swpGraph), type=c("gnm"), directed = FALSE, loops = FALSE)
-    
+    print("rand")
     print(size^dim)
     print("Vertices Count:")
     print(vcount(randGraph))
@@ -38,6 +38,8 @@ makeRandNetwork <- function(dim, size, swpGraph){
 return(randGraph)
 }
 
+# Might forget about this for a bit to focus on more important parts of the model.
+# It might slow things down alot if I code it by myself by hand. (high complexity)
 # Calculate S^delta
 calc_Sdelta <- function(swpGraph, randGraph){
     # Calculate LamdaG (LamdaG = Lg / Lrand)
@@ -53,7 +55,11 @@ calc_Sdelta <- function(swpGraph, randGraph){
     
     # Calculate GammaDeltaG ( GammaDeltaG = cDeltaG / cDeltaRand )
     
-    # Find a way to determine the number of triangles in a graph. ( and number of paths of length 2?)  
+    # Find a way to determine the number of triangles in a graph. ( and number of paths of length 2?)
+    print("Triangle Stuff")
+    # Generates an adjacency matrix of the graph that can be used to find all the triangles.
+    swpMatrix = get.adjacency(swpGraph, type=c("upper"))  
+    print(swpMatrix)
 }
 
 #################################################
@@ -63,7 +69,7 @@ calc_Sdelta <- function(swpGraph, randGraph){
 ## Model Parameters
 dim       = 3	# Interger Constant, the demension of the starting lattice
 size      = 4 	# The size of the lattice along each dimension
-nei       = 2   # the neighborhood within which the verticies of the lattice will be connected
+nei       = 1   # the neighborhood within which the verticies of the lattice will be connected
 p         = .5  # the rewiring probabillity
 
 
