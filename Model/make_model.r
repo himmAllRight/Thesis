@@ -39,11 +39,26 @@ return(randGraph)
 }
 
 # Finds the hubs of a network.
-findHubs <- function(swpGraph){
+findHubs <- function(hubThreshold, swpGraph){
     print("hub scores")
-    hubMatrix = hub.score(swpGraph) # !! need to only get matrix from this
+    hubScore  = hub.score(swpGraph) # !! need to only get matrix from this
+    hubMatrix = hubScore$vector
+    print(hubMatrix)
+    print(length(hubMatrix))
+    hubcount = 0
+    for (i in seq(from=1, to= length(hubMatrix), by=1)){
+        if (hubMatrix[i] >= hubThreshold){
+            hubMatrix[i] = 1
+            hubcount = hubcount + 1
+        }
+        else{
+            hubMatrix[i] = 0
+        }
+    }
+    print(hubcount)
     print(hubMatrix)
 
+    return(hubMatrix)
     # Once we have a matrix of the hubs, add a for loop to change each one
     # to a defining color such as red, and return the graph so it can be printed
     # with the others.
@@ -73,25 +88,41 @@ calc_Sdelta <- function(swpGraph, randGraph){
     print(swpMatrix)
 }
 
+plot_Graph <- function(swpGraph, randGraph, hubMatrix){
+    # Color hubs in SWP plot.
+    for (i in seq(from=1, to= length(hubMatrix), by=1)){
+        if(hubMatrix[i] == 1){
+            V(swpGraph)$color[i] = "green"
+        }
+        else{
+            V(swpGraph)$color[i] = "cyan"
+        }
+    }
+    ## Plot
+    png(file="SWP_plot1.png")
+    plot(swpGraph)
+    png(file="rand_plot1.png")
+    plot(randGraph)
+}
+
 #################################################
 ############## Execition Code ###################
 #################################################
 
 ## Model Parameters
-dim       = 3	# Interger Constant, the demension of the starting lattice
-size      = 4 	# The size of the lattice along each dimension
-nei       = 1   # the neighborhood within which the verticies of the lattice will be connected
-p         = .5  # the rewiring probabillity
+dim              = 3	# Interger Constant, the demension of the starting lattice
+size             = 4 	# The size of the lattice along each dimension
+nei              = 1    # the neighborhood within which the verticies of the lattice will be connected
+p                = .5   # the rewiring probabillity
+
+## Other Parameters
+hubThreshold     = 0.8  # The threshold of the centrality score for determing a hub
 
 
 ## Execute
 swpGraph = makeSWPNetwork(dim,size,nei,p)
 randGraph = makeRandNetwork(dim, size, swpGraph)
 #Sdelta = calc_Sdelta(swpGraph, randGraph)
-hubs = findHubs(swpGraph)
+hubMatrix = findHubs(hubThreshold, swpGraph)
 
-## Plot
-png(file="SWP_plot1.png")
-plot(swpGraph)
-png(file="rand_plot1.png")
-plot(randGraph)
+plotGraph = plot_Graph(swpGraph, randGraph, hubMatrix)
