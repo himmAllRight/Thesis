@@ -12,13 +12,13 @@ library(igraph)
 makeSWPNetwork <- function(dim,size,nei,p){
     swpGraph <- watts.strogatz.game(dim,size,nei,p, loops = FALSE, multiple = FALSE)
 
-    print(size^dim)
-    print("Vertices Count:")
-    print(vcount(swpGraph))
-    print("Edge Count:")
-    print(ecount(swpGraph))
-    print("Degree:")
-    print(degree(swpGraph))
+#    print(size^dim)
+#    print("Vertices Count:")
+#    print(vcount(swpGraph))
+#    print("Edge Count:")
+#    print(ecount(swpGraph))
+#    print("Degree:")
+#    print(degree(swpGraph))
 
 return(swpGraph)
 }
@@ -26,24 +26,23 @@ return(swpGraph)
 # Function to Generate an Erdos-Renyi random graph
 makeRandNetwork <- function(dim, size, swpGraph){
     randGraph <- erdos.renyi.game((size^dim), ecount(swpGraph), type=c("gnm"), directed = FALSE, loops = FALSE)
-    print("rand")
-    print(size^dim)
-    print("Vertices Count:")
-    print(vcount(randGraph))
-    print("Edge Count:")
-    print(ecount(randGraph))
-    print("Degree:")
-    print(degree(randGraph))
+#    print("rand")
+#    print(size^dim)
+#    print("Vertices Count:")
+#    print(vcount(randGraph))
+#    print("Edge Count:")
+#    print(ecount(randGraph))
+#    print("Degree:")
+#    print(degree(randGraph))
 return(randGraph)
 }
 
 # Finds the hubs of a network.
-findHubs <- function(hubThreshold, swpGraph){
-    print("hub scores")
+findHubs <- function(runCount, hubThreshold, swpGraph){
+#    print("hub scores")
     hubScore  = hub.score(swpGraph) # !! need to only get matrix from this
     hubMatrix = hubScore$vector
-    print(hubMatrix)
-    print(length(hubMatrix))
+#    print(hubMatrix)
     hubcount = 0
     for (i in seq(from=1, to= length(hubMatrix), by=1)){
         if (hubMatrix[i] >= hubThreshold){
@@ -54,8 +53,6 @@ findHubs <- function(hubThreshold, swpGraph){
             hubMatrix[i] = 0
         }
     }
-    print(hubcount)
-    print(hubMatrix)
 
     return(hubMatrix)
     # Once we have a matrix of the hubs, add a for loop to change each one
@@ -87,7 +84,7 @@ calc_Sdelta <- function(swpGraph, randGraph){
     print(swpMatrix)
 }
 
-plot_Graph <- function(swpGraph, randGraph, hubMatrix){
+plot_Graph <- function(runCount, swpGraph, randGraph, hubMatrix){
     # Color hubs in SWP plot.
     for (i in seq(from=1, to= length(hubMatrix), by=1)){
         if(hubMatrix[i] == 1){
@@ -98,7 +95,7 @@ plot_Graph <- function(swpGraph, randGraph, hubMatrix){
         }
     }
     ## Plot
-    png(file="SWP_plot1.png")
+    png(file=(paste("SWP_plot",runCount,".png",sep="")))
     plot(swpGraph)
     png(file="rand_plot1.png")
     plot(randGraph)
@@ -116,7 +113,8 @@ p                = .5   # the rewiring probabillity
 
 ## Other Parameters
 hubThreshold     = 0.8  # The threshold of the centrality score for determing a hub
-trialCount= 5
+trialCount= 25
+
 
 # Generate Directories for all trials
 for (i in seq(from=1, to= trialCount, by=1)){
@@ -129,16 +127,25 @@ setwd("~/Dropbox/School/2013-2014/Thesis/Model/.")
 runList  = Sys.glob("model_run*")
 
 # Loop through each run
+runCount =1
 for( currDir in runList){
     setwd(currDir) # enter directory
     print(getwd())
-
+#    -----------------------------------------------
+#    --------------- Model Sequence ----------------
+#    -----------------------------------------------
     # What to run for each model run
     swpGraph = makeSWPNetwork(dim,size,nei,p)
     randGraph = makeRandNetwork(dim, size, swpGraph)
     #Sdelta = calc_Sdelta(swpGraph, randGraph)
-    hubMatrix = findHubs(hubThreshold, swpGraph)
-    plotGraph = plot_Graph(swpGraph, randGraph, hubMatrix)
-    
+    hubMatrix = findHubs(runCount, hubThreshold, swpGraph)
+    plotGraph = plot_Graph(runCount, swpGraph, randGraph, hubMatrix)
+
+#    -----------------------------------------------
+#    -----------------------------------------------
+    print("runcount")
+    print(runCount)
+    runCount = runCount + 1
     setwd("..") # Go up a directory
 }
+
