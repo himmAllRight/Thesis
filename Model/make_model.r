@@ -3,9 +3,6 @@
 ## Make Model Script
 library(igraph)
 
-# itteration of runs
-setwd("~/Dropbox/School/2013-2014/Thesis/Model/.")
-runList  = Sys.glob("model_run*")
 
 #################################################
 ############### Defined Functions ###############
@@ -119,12 +116,29 @@ p                = .5   # the rewiring probabillity
 
 ## Other Parameters
 hubThreshold     = 0.8  # The threshold of the centrality score for determing a hub
+trialCount= 5
 
+# Generate Directories for all trials
+for (i in seq(from=1, to= trialCount, by=1)){
+    print(paste('mkdir model_run',i, sep=""))
+    system(paste('mkdir model_run',i, sep=""))
+}
 
-## Execute
-swpGraph = makeSWPNetwork(dim,size,nei,p)
-randGraph = makeRandNetwork(dim, size, swpGraph)
-#Sdelta = calc_Sdelta(swpGraph, randGraph)
-hubMatrix = findHubs(hubThreshold, swpGraph)
+# itteration of runs
+setwd("~/Dropbox/School/2013-2014/Thesis/Model/.")
+runList  = Sys.glob("model_run*")
 
-plotGraph = plot_Graph(swpGraph, randGraph, hubMatrix)
+# Loop through each run
+for( currDir in runList){
+    setwd(currDir) # enter directory
+    print(getwd())
+
+    # What to run for each model run
+    swpGraph = makeSWPNetwork(dim,size,nei,p)
+    randGraph = makeRandNetwork(dim, size, swpGraph)
+    #Sdelta = calc_Sdelta(swpGraph, randGraph)
+    hubMatrix = findHubs(hubThreshold, swpGraph)
+    plotGraph = plot_Graph(swpGraph, randGraph, hubMatrix)
+    
+    setwd("..") # Go up a directory
+}
