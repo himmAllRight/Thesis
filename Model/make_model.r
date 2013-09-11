@@ -3,6 +3,10 @@
 ## Make Model Script
 library(igraph)
 
+# itteration of runs
+setwd("~/Dropbox/School/2013-2014/Thesis/Model/.")
+runList  = Sys.glob("model_run*")
+
 #################################################
 ############### Defined Functions ###############
 #################################################
