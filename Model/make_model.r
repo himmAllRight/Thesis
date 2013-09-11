@@ -1,8 +1,6 @@
 ## Ryan Himmelwright
 ## Honors Thesis
 ## Make Model Script
-## 8/28/2013
-
 library(igraph)
 
 #################################################
