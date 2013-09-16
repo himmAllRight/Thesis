@@ -24,8 +24,11 @@ return(swpGraph)
 }
 
 # Function to Generate an Erdos-Renyi random graph
-makeRandNetwork <- function(dim, size, swpGraph){
-    randGraph <- erdos.renyi.game((size^dim), ecount(swpGraph), type=c("gnm"), directed = FALSE, loops = FALSE)
+makeRandNetwork <- function(dim, size, nei, swpGraph){
+#    randGraph <- erdos.renyi.game((size^dim), ecount(swpGraph), type=c("gnm"), directed = FALSE, loops = FALSE)
+
+    # Try to make a random graph with the watts.strogatz.game function
+     randGraph <- watts.strogatz.game(dim,size,nei,1,loops = FALSE, multiple = FALSE)
 #    print("rand")
 #    print(size^dim)
 #    print("Vertices Count:")
@@ -129,10 +132,10 @@ plot_Graph <- function(runCount, swpGraph, randGraph, hubMatrix){
 #################################################
 
 ## Model Parameters
-dim              = 3	# Interger Constant, the demension of the starting lattice
-size             = 4 	# The size of the lattice along each dimension
+dim              = 5	# Interger Constant, the demension of the starting lattice
+size             = 6 	# The size of the lattice along each dimension
 nei              = 1    # the neighborhood within which the verticies of the lattice will be connected
-p                = .7   # the rewiring probabillity
+p                = .6   # the rewiring probabillity
 
 ## Other Parameters
 hubThreshold     = 0.8  # The threshold of the centrality score for determing a hub
@@ -159,11 +162,11 @@ for( currDir in runList){
 #    -----------------------------------------------
     # What to run for each model run
     swpGraph = makeSWPNetwork(dim,size,nei,p)
-    randGraph = makeRandNetwork(dim, size, swpGraph)
+    randGraph = makeRandNetwork(dim, size, nei, swpGraph)
     #Sdelta = calc_Sdelta(swpGraph, randGraph)
     hubMatrix = findHubs(runCount, hubThreshold, swpGraph)
     Sws = calc_Sws(swpGraph, randGraph)
-    plotGraph = plot_Graph(runCount, swpGraph, randGraph, hubMatrix)
+#    plotGraph = plot_Graph(runCount, swpGraph, randGraph, hubMatrix)
 
 #    -----------------------------------------------
 #    -----------------------------------------------
