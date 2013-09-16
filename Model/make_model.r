@@ -63,12 +63,24 @@ findHubs <- function(runCount, hubThreshold, swpGraph){
 # Calculates S^WS for the network.
 calc_Sws <- function(swpGraph, randGraph){
     print("transitivity")
-    swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL, isolates="zero")
-    randGamma = transitivity(randGraph, type="global", vids=NULL, weights=NULL, isolates="zero")
-    Gamma = (swpGamma/randGamma)
+    swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL, isolates="zero") # calculates colustering coefficient of the swp graph.
+    randGamma = transitivity(randGraph, type="global", vids=NULL, weights=NULL, isolates="zero") # calculates colustering coefficient of the rand graph.
+    Gamma = (swpGamma/randGamma) # combines them to get the Gamma value.
     print(swpGamma)
     print(randGamma)
     print(Gamma)
+
+    print("path length")
+    swpLambda = average.path.length(swpGraph)   # Calculates the mean minmal path length for swp graph
+    randLambda = average.path.length(randGraph) # Calculates the mean minmal path length corresponding rand graph
+    Lambda = (swpLambda / randLambda)           # Combines to get the ratio Lambda value
+    print(swpLambda)
+    print(randLambda)
+    print(Lambda)
+
+    print("S^WS")
+    Sws = (Gamma/Lambda) # Calculates S^WS from the ratio.
+    print(Sws)
 }
 
 # Might forget about this for a bit to focus on more important parts of the model.
@@ -120,7 +132,7 @@ plot_Graph <- function(runCount, swpGraph, randGraph, hubMatrix){
 dim              = 3	# Interger Constant, the demension of the starting lattice
 size             = 4 	# The size of the lattice along each dimension
 nei              = 1    # the neighborhood within which the verticies of the lattice will be connected
-p                = .5   # the rewiring probabillity
+p                = .7   # the rewiring probabillity
 
 ## Other Parameters
 hubThreshold     = 0.8  # The threshold of the centrality score for determing a hub
