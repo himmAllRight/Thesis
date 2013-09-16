@@ -60,6 +60,17 @@ findHubs <- function(runCount, hubThreshold, swpGraph){
     # with the others.
 }
 
+# Calculates S^WS for the network.
+calc_Sws <- function(swpGraph, randGraph){
+    print("transitivity")
+    swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL, isolates="zero")
+    randGamma = transitivity(randGraph, type="global", vids=NULL, weights=NULL, isolates="zero")
+    Gamma = (swpGamma/randGamma)
+    print(swpGamma)
+    print(randGamma)
+    print(Gamma)
+}
+
 # Might forget about this for a bit to focus on more important parts of the model.
 # It might slow things down alot if I code it by myself by hand. (high complexity)
 # Calculate S^delta
@@ -113,7 +124,7 @@ p                = .5   # the rewiring probabillity
 
 ## Other Parameters
 hubThreshold     = 0.8  # The threshold of the centrality score for determing a hub
-trialCount= 25
+trialCount= 5
 
 
 # Generate Directories for all trials
@@ -139,6 +150,7 @@ for( currDir in runList){
     randGraph = makeRandNetwork(dim, size, swpGraph)
     #Sdelta = calc_Sdelta(swpGraph, randGraph)
     hubMatrix = findHubs(runCount, hubThreshold, swpGraph)
+    Sws = calc_Sws(swpGraph, randGraph)
     plotGraph = plot_Graph(runCount, swpGraph, randGraph, hubMatrix)
 
 #    -----------------------------------------------
