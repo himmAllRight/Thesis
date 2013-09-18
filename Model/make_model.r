@@ -26,17 +26,9 @@ return(swpGraph)
 # Function to Generate an Erdos-Renyi random graph
 makeRandNetwork <- function(dim, size, nei, swpGraph){
 #    randGraph <- erdos.renyi.game((size^dim), ecount(swpGraph), type=c("gnm"), directed = FALSE, loops = FALSE)
-
     # Try to make a random graph with the watts.strogatz.game function
      randGraph <- watts.strogatz.game(dim,size,nei,1,loops = FALSE, multiple = FALSE)
-#    print("rand")
-#    print(size^dim)
-#    print("Vertices Count:")
-#    print(vcount(randGraph))
-#    print("Edge Count:")
-#    print(ecount(randGraph))
-#    print("Degree:")
-#    print(degree(randGraph))
+
 return(randGraph)
 }
 
@@ -84,6 +76,7 @@ calc_Sws <- function(swpGraph, randGraph){
     print("S^WS")
     Sws = (Gamma/Lambda) # Calculates S^WS from the ratio.
     print(Sws)
+    return(Sws)
 }
 
 # Might forget about this for a bit to focus on more important parts of the model.
@@ -110,6 +103,25 @@ calc_Sdelta <- function(swpGraph, randGraph){
     print(swpMatrix)
 }
 
+print_graph_stats <- function(runCount, swpGraph, swp_Sws, randGraph, hubMatrix){
+#    outfileName = "../test_output.txt" # Generate output file of all runs
+    outfileName = "../cumulative_attributes.txt"   # Generate output file of each run in each run directory
+    
+    for (i in seq(from=1, to=2, by=1)){
+        write('runCount: ', file= outfileName, append = TRUE, sep= ", ")
+        write(runCount, file= outfileName, append = TRUE, sep= ", ")
+        write('swpGraph Vertice count: ', file= outfileName, append = TRUE, sep= ", ")
+        write(vcount(swpGraph), file= outfileName, append = TRUE,  sep= ", ")
+        write('swpGraph Edge count: ', file= outfileName, append = TRUE, sep= ", ")
+        write(ecount(swpGraph), file= outfileName, append = TRUE,  sep= ", ")
+        write('swpGraph Sws: ', file= outfileName, append = TRUE, sep= ", ")
+        write(swp_Sws , file= outfileName, append = TRUE,  sep= ", ")
+        write('', file= outfileName, append = TRUE)
+
+        outfileName = paste('output_run',i,'.txt', sep="")
+    }
+}
+
 plot_Graph <- function(runCount, swpGraph, randGraph, hubMatrix){
     # Color hubs in SWP plot.
     for (i in seq(from=1, to= length(hubMatrix), by=1)){
@@ -132,10 +144,10 @@ plot_Graph <- function(runCount, swpGraph, randGraph, hubMatrix){
 #################################################
 
 ## Model Parameters
-dim              = 5	# Interger Constant, the demension of the starting lattice
-size             = 6 	# The size of the lattice along each dimension
+dim              = 4	# Interger Constant, the demension of the starting lattice
+size             = 3 	# The size of the lattice along each dimension
 nei              = 1    # the neighborhood within which the verticies of the lattice will be connected
-p                = .6   # the rewiring probabillity
+p                = 1   # the rewiring probabillity
 
 ## Other Parameters
 hubThreshold     = 0.8  # The threshold of the centrality score for determing a hub
@@ -156,7 +168,7 @@ runList  = Sys.glob("model_run*")
 runCount =1
 for( currDir in runList){
     setwd(currDir) # enter directory
-    print(getwd())
+    print(getwd()) # print current working directory
 #    -----------------------------------------------
 #    --------------- Model Sequence ----------------
 #    -----------------------------------------------
@@ -165,8 +177,9 @@ for( currDir in runList){
     randGraph = makeRandNetwork(dim, size, nei, swpGraph)
     #Sdelta = calc_Sdelta(swpGraph, randGraph)
     hubMatrix = findHubs(runCount, hubThreshold, swpGraph)
-    Sws = calc_Sws(swpGraph, randGraph)
-#    plotGraph = plot_Graph(runCount, swpGraph, randGraph, hubMatrix)
+    swp_Sws = calc_Sws(swpGraph, randGraph)
+    print_graph_stats(runCount, swpGraph, swp_Sws, randGraph, hubMatrix)
+    plotGraph = plot_Graph(runCount, swpGraph, randGraph, hubMatrix)
 
 #    -----------------------------------------------
 #    -----------------------------------------------
