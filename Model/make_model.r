@@ -116,6 +116,7 @@ print_graph_stats <- function(runCount, swpGraph, swp_Sws, randGraph, hubMatrix)
         write(ecount(swpGraph), file= outfileName, append = TRUE,  sep= ", ")
         write('swpGraph Sws: ', file= outfileName, append = TRUE, sep= ", ")
         write(swp_Sws , file= outfileName, append = TRUE,  sep= ", ")
+
         write('', file= outfileName, append = TRUE)
 
         outfileName = paste('output_run',i,'.txt', sep="")
