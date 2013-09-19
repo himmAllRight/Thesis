@@ -12,14 +12,6 @@ library(igraph)
 makeSWPNetwork <- function(dim,size,nei,p){
     swpGraph <- watts.strogatz.game(dim,size,nei,p, loops = FALSE, multiple = FALSE)
 
-#    print(size^dim)
-#    print("Vertices Count:")
-#    print(vcount(swpGraph))
-#    print("Edge Count:")
-#    print(ecount(swpGraph))
-#    print("Degree:")
-#    print(degree(swpGraph))
-
 return(swpGraph)
 }
 
@@ -112,8 +104,8 @@ print_graph_stats <- function(runCount, swpGraph, swp_Sws, randGraph, hubMatrix)
 #        write(ecount(swpGraph), file= outfileName, append = TRUE,  sep= ", ")
         write('swpGraph Sws: ', file= outfileName, append = TRUE, sep= ", ")
         write(swp_Sws , file= outfileName, append = TRUE,  sep= ", ")
-        #write('swpGraph Hub count: ', file= outfileName, append = TRUE, sep= ", ")
-        #write(hubCounts(swpGraph) , file= outfileName, append = TRUE,  sep= ", ")
+        write('swpGraph Hub count: ', file= outfileName, append = TRUE, sep= ", ")
+        write(hubCounts(swpGraph) , file= outfileName, append = TRUE,  sep= ", ")
 
         write('', file= outfileName, append = TRUE)
 
@@ -160,18 +152,19 @@ for (i in seq(from=1, to= trialCount, by=1)){
     system(paste('mkdir model_run',i, sep=""))
 }
 
+
 # itteration of runs
-setwd("~/Desktop/model_test_batch/.")
 runList  = Sys.glob("model_run*")
 
 # Loop through each run
 runCount =1
 for( currDir in runList){
+    print(currDir)
     setwd(currDir) # enter directory
     print(getwd()) # print current working directory
-#    -----------------------------------------------
-#    --------------- Model Sequence ----------------
-#    -----------------------------------------------
+    #-----------------------------------------------
+    #--------------- Model Sequence ----------------
+    #-----------------------------------------------
     # What to run for each model run
     swpGraph = makeSWPNetwork(dim,size,nei,p)
     randGraph = makeRandNetwork(dim, size, nei, swpGraph)
@@ -179,7 +172,7 @@ for( currDir in runList){
     hubMatrix = findHubs(runCount, hubThreshold, swpGraph)
     swp_Sws = calc_Sws(swpGraph, randGraph)
     print_graph_stats(runCount, swpGraph, swp_Sws, randGraph, hubMatrix)
-    plotGraph = plot_Graph(runCount, swpGraph, randGraph, hubMatrix)
+#    plotGraph = plot_Graph(runCount, swpGraph, randGraph, hubMatrix)
 
 #    -----------------------------------------------
 #    -----------------------------------------------
@@ -188,4 +181,3 @@ for( currDir in runList){
     runCount = runCount + 1
     setwd("..") # Go up a directory
 }
-
