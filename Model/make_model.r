@@ -34,46 +34,42 @@ return(randGraph)
 
 # Finds the hubs of a network.
 findHubs <- function(runCount, hubThreshold, swpGraph){
-#    print("hub scores")
     hubScore  = hub.score(swpGraph) # !! need to only get matrix from this
     hubMatrix = hubScore$vector
-#    print(hubMatrix)
-    hubcount = 0
+
     for (i in seq(from=1, to= length(hubMatrix), by=1)){
         if (hubMatrix[i] >= hubThreshold){
             hubMatrix[i] = 1
-            hubcount = hubcount + 1
         }
         else{
             hubMatrix[i] = 0
         }
     }
-
     return(hubMatrix)
-    # Once we have a matrix of the hubs, add a for loop to change each one
-    # to a defining color such as red, and return the graph so it can be printed
-    # with the others.
 }
+
+# Returns the number of hubs in the Matrix
+hubCounts <- function(hubMatrix){
+    hubcount = 0
+    for (i in seq(from=1, to= length(hubMatrix), by=1)){
+        if (hubMatrix[i] >= hubThreshold){
+            hubcount = hubcount + 1
+        }
+    }
+    return(hubcount)
+}
+
 
 # Calculates S^WS for the network.
 calc_Sws <- function(swpGraph, randGraph){
-    print("transitivity")
+#    print("transitivity")
     swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL, isolates="zero") # calculates colustering coefficient of the swp graph.
     randGamma = transitivity(randGraph, type="global", vids=NULL, weights=NULL, isolates="zero") # calculates colustering coefficient of the rand graph.
     Gamma = (swpGamma/randGamma) # combines them to get the Gamma value.
-    print(swpGamma)
-    print(randGamma)
-    print(Gamma)
-
-    print("path length")
     swpLambda = average.path.length(swpGraph)   # Calculates the mean minmal path length for swp graph
     randLambda = average.path.length(randGraph) # Calculates the mean minmal path length corresponding rand graph
     Lambda = (swpLambda / randLambda)           # Combines to get the ratio Lambda value
-    print(swpLambda)
-    print(randLambda)
-    print(Lambda)
 
-    print("S^WS")
     Sws = (Gamma/Lambda) # Calculates S^WS from the ratio.
     print(Sws)
     return(Sws)
@@ -110,12 +106,14 @@ print_graph_stats <- function(runCount, swpGraph, swp_Sws, randGraph, hubMatrix)
     for (i in seq(from=1, to=2, by=1)){
         write('runCount: ', file= outfileName, append = TRUE, sep= ", ")
         write(runCount, file= outfileName, append = TRUE, sep= ", ")
-        write('swpGraph Vertice count: ', file= outfileName, append = TRUE, sep= ", ")
-        write(vcount(swpGraph), file= outfileName, append = TRUE,  sep= ", ")
-        write('swpGraph Edge count: ', file= outfileName, append = TRUE, sep= ", ")
-        write(ecount(swpGraph), file= outfileName, append = TRUE,  sep= ", ")
+#        write('swpGraph Vertice count: ', file= outfileName, append = TRUE, sep= ", ")
+#        write(vcount(swpGraph), file= outfileName, append = TRUE,  sep= ", ")
+#        write('swpGraph Edge count: ', file= outfileName, append = TRUE, sep= ", ")
+#        write(ecount(swpGraph), file= outfileName, append = TRUE,  sep= ", ")
         write('swpGraph Sws: ', file= outfileName, append = TRUE, sep= ", ")
         write(swp_Sws , file= outfileName, append = TRUE,  sep= ", ")
+        #write('swpGraph Hub count: ', file= outfileName, append = TRUE, sep= ", ")
+        #write(hubCounts(swpGraph) , file= outfileName, append = TRUE,  sep= ", ")
 
         write('', file= outfileName, append = TRUE)
 
@@ -140,6 +138,7 @@ plot_Graph <- function(runCount, swpGraph, randGraph, hubMatrix){
     plot(randGraph)
 }
 
+
 #################################################
 ############## Execition Code ###################
 #################################################
@@ -152,7 +151,7 @@ p                = 1   # the rewiring probabillity
 
 ## Other Parameters
 hubThreshold     = 0.8  # The threshold of the centrality score for determing a hub
-trialCount= 5
+trialCount= 120
 
 
 # Generate Directories for all trials
@@ -162,7 +161,7 @@ for (i in seq(from=1, to= trialCount, by=1)){
 }
 
 # itteration of runs
-setwd("~/Dropbox/School/2013-2014/Thesis/Model/.")
+setwd("~/Desktop/model_test_batch/.")
 runList  = Sys.glob("model_run*")
 
 # Loop through each run
