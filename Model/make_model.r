@@ -28,13 +28,18 @@ return(randGraph)
 findHubs <- function(runCount, hubThreshold, swpGraph){
     hubScore  = hub.score(swpGraph) # !! need to only get matrix from this
     hubMatrix = hubScore$vector
+    print(hubMatrix)
 
     for (i in seq(from=1, to= length(hubMatrix), by=1)){
         if (hubMatrix[i] >= hubThreshold){
+            print("--------HERE---------"            )
+            print(hubMatrix[i])            
             hubMatrix[i] = 1
+            print(hubMatrix[i])
         }
         else{
             hubMatrix[i] = 0
+            print(hubMatrix[i])
         }
     }
     return(hubMatrix)
@@ -143,7 +148,7 @@ p                = 1   # the rewiring probabillity
 
 ## Other Parameters
 hubThreshold     = 0.8  # The threshold of the centrality score for determing a hub
-trialCount= 120
+trialCount= 25
 
 
 # Generate Directories for all trials
@@ -181,3 +186,4 @@ for( currDir in runList){
     runCount = runCount + 1
     setwd("..") # Go up a directory
 }
+print(warnings())
