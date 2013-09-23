@@ -12,7 +12,6 @@ library(base)
 # Function to Generate Small World Graph
 makeSWPNetwork <- function(dim,size,nei,p){
     swpGraph <- watts.strogatz.game(dim,size,nei,p, loops = FALSE, multiple = FALSE)
-
 return(swpGraph)
 }
 
@@ -81,7 +80,6 @@ calc_Sdelta <- function(swpGraph, randGraph){
 }
 
 print_graph_stats <- function(runCount, swpGraph, swp_Sws, randGraph, hubMatrix){
-#    outfileName = "../test_output.txt" # Generate output file of all runs
     outfileName = "../cumulative_attributes.txt"   # Generate output file of each run in each run directory
     
     for (i in seq(from=1, to=2, by=1)){
@@ -124,7 +122,7 @@ plot_Graph <- function(runCount, swpGraph, randGraph, hubMatrix){
 #################################################
 ############## Execition Code ###################
 #################################################
-trialCount= 30 
+trialCount= 10 
 
 ## Model Parameters
 dim              = 4	# Interger Constant, the demension of the starting lattice
@@ -154,8 +152,16 @@ for( currDir in runList){
     #--------------- Model Sequence ----------------
     #-----------------------------------------------
     # What to run for each model run
-    swpGraph = makeSWPNetwork(dim,size,nei,p)
-    randGraph = makeRandNetwork(dim, size, nei, swpGraph)
+
+    # Generate small world graph with corresponding random graph.
+    not_swp = TRUE # true if the graphs are not swp
+    while(not_swp){
+        print("redo")
+        swpGraph = makeSWPNetwork(dim,size,nei,p)
+        randGraph = makeRandNetwork(dim, size, nei, swpGraph)
+        if(calc_Sws(swpGraph, randGraph) > 1) not_swp = FALSE
+    }
+
     #Sdelta = calc_Sdelta(swpGraph, randGraph)
     hubMatrix = findHubs(runCount, hubThreshold, swpGraph)
     swp_Sws = calc_Sws(swpGraph, randGraph)
