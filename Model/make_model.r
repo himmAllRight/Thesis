@@ -1,8 +1,9 @@
+
 ## Ryan Himmelwright
 ## Honors Thesis
 ## Make Model Script
 library(igraph)
-
+library(base)
 
 #################################################
 ############### Defined Functions ###############
@@ -27,33 +28,16 @@ return(randGraph)
 # Finds the hubs of a network.
 findHubs <- function(runCount, hubThreshold, swpGraph){
     hubScore  = hub.score(swpGraph) # !! need to only get matrix from this
-    hubMatrix = hubScore$vector
-    print(hubMatrix)
-
-    for (i in seq(from=1, to= length(hubMatrix), by=1)){
-        if (hubMatrix[i] >= hubThreshold){
-            print("--------HERE---------"            )
-            print(hubMatrix[i])            
-            hubMatrix[i] = 1
-            print(hubMatrix[i])
-        }
-        else{
-            hubMatrix[i] = 0
-            print(hubMatrix[i])
-        }
-    }
+    hubValues = hubScore$vector
+    hubMatrix = replace(replace(hubValues,hubValues >= hubThreshold, 1), hubValues < hubThreshold,0)
     return(hubMatrix)
 }
 
 # Returns the number of hubs in the Matrix
 hubCounts <- function(hubMatrix){
-    hubcount = 0
-    for (i in seq(from=1, to= length(hubMatrix), by=1)){
-        if (hubMatrix[i] >= hubThreshold){
-            hubcount = hubcount + 1
-        }
-    }
-    return(hubcount)
+    count = sum(hubMatrix == 1)
+    print(count)
+    return(count)
 }
 
 
@@ -110,7 +94,8 @@ print_graph_stats <- function(runCount, swpGraph, swp_Sws, randGraph, hubMatrix)
         write('swpGraph Sws: ', file= outfileName, append = TRUE, sep= ", ")
         write(swp_Sws , file= outfileName, append = TRUE,  sep= ", ")
         write('swpGraph Hub count: ', file= outfileName, append = TRUE, sep= ", ")
-        write(hubCounts(swpGraph) , file= outfileName, append = TRUE,  sep= ", ")
+        count = sum(hubMatrix == 1)
+        write(count, file= outfileName, append = TRUE,  sep= ", ")
 
         write('', file= outfileName, append = TRUE)
 
@@ -139,16 +124,14 @@ plot_Graph <- function(runCount, swpGraph, randGraph, hubMatrix){
 #################################################
 ############## Execition Code ###################
 #################################################
+trialCount= 30 
 
 ## Model Parameters
 dim              = 4	# Interger Constant, the demension of the starting lattice
 size             = 3 	# The size of the lattice along each dimension
 nei              = 1    # the neighborhood within which the verticies of the lattice will be connected
 p                = 1   # the rewiring probabillity
-
-## Other Parameters
 hubThreshold     = 0.8  # The threshold of the centrality score for determing a hub
-trialCount= 25
 
 
 # Generate Directories for all trials
@@ -181,6 +164,7 @@ for( currDir in runList){
 
 #    -----------------------------------------------
 #    -----------------------------------------------
+    print(hubMatrix)
     print("runcount")
     print(runCount)
     runCount = runCount + 1
