@@ -52,7 +52,7 @@ CalcSws <- function(swpGraph, randGraph){
   randLambda = average.path.length(randGraph)
   lambda = (swpLambda / randLambda)  # Combines to get the ratio Lambda value
 
-  Sws = (Gamma/Lambda) # Calculates S^WS from the ratio.
+  Sws = (gamma/lambda) # Calculates S^WS from the ratio.
 
   return(Sws)
 }
@@ -119,7 +119,7 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
 #################################################
 
 # Number of runs
-trialCount= 100
+trialCount= 10
 
 ## Model Parameters
 dim           = 4   # Int Constant, the demension of the starting lattice
@@ -130,20 +130,18 @@ hubThreshold  = 0.8 # The threshold of the centrality score for determing a hub
 
 
 # Generate Directories for all trials
-for(i in seq(from=1, to= trialCount, by=1)){
+#  print(paste('mkdir model_run',i, sep=""))
+#  system(paste('mkdir model_run',i, sep=""))
+
+
+runCount =1
+for( i in seq(from=1, to= trialCount, by=1)){
+  print(getwd()) # print current working directory
+  
   print(paste('mkdir model_run',i, sep=""))
   system(paste('mkdir model_run',i, sep=""))
-}
-
-# itteration of runs
-runList  = Sys.glob("model_run*")
-
-# Loop through each run
-runCount =1
-for( currDir in runList){
-  print(currDir)
-  setwd(currDir) # enter directory
-  print(getwd()) # print current working directory
+  setwd(paste('model_run',i, sep=""))
+  print(getwd())
 
   #-----------------------------------------------
   #--------------- Model Sequence ----------------
@@ -154,9 +152,9 @@ for( currDir in runList){
   notSWP = TRUE # true if the graphs are not swp
   while(notSWP){
     print("redo")
-    SwpGraph = makeSWPNetwork(dim,size,nei,p)
-    RandGraph = makeRandNetwork(dim, size, nei, swpGraph)
-    if(calcSws(swpGraph, randGraph) > 1) notSWP = FALSE
+    swpGraph = MakeSWPNetwork(dim,size,nei,p)
+    randGraph = MakeRandNetwork(dim, size, nei, swpGraph)
+    if(CalcSws(swpGraph, randGraph) > 1) notSWP = FALSE
     }
     
     # Run functions on Graphs
