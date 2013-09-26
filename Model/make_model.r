@@ -76,15 +76,27 @@ CalcSdelta <- function(swpGraph, randGraph){
 ################################################################################
 ##############################  Models Functions  ##############################
 ################################################################################
-Run_Random_Model <- function(swpGraph, randGraph, hubMatrix){
-  # Model Switches
-  # swpGraph[j,k] <- FALSE    # Delete edge between j and k
-  # swpGraph[j,k] <- 1        # Add edge between j and k
-  # x<- sample(1:length(swpGraph), 1) #random select a number
-  # y<- sample(1:length(swpGraph), 1) # random select a number
-  # Call to print parameters
+Run_Random_Model <- function(swpGraph, randGraph, hubMatrix, timeSteps){
+  for ( step in seq(from=1, to=timeSteps, by=1)){
+    x<- sample(1:length(swpGraph), 1) # random int
+    y<- sample(1:length(swpGraph), 1) # random int
+    z<- sample(1:length(swpGraph), 1) # random int
   
-}
+    while( swpGraph[x,y] == 0){
+      x<- sample(1:length(swpGraph), 1) # random connected
+      y<- sample(1:length(swpGraph), 1) # random connected
+    }
+    swpGraph[x,y] <- FALSE              # Remove edge between x and y
+  
+    while( swpGraph[x,z] == 1){
+      z<- sample(1:length(swpGraph), 1) # random int not connected
+    }
+    
+    swpGraph[x,z] <- 1                  # Add edge between x and z
+    
+    print(swpGraph[])
+  }
+} 
 
 Run_Hubs_Model <- function(swpGraph, randGraph, hubMatrix){
 
@@ -141,10 +153,11 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
 ################################################################################
 # Number of runs
 trialCount= 10
+timeSteps = 25
 
 ## Model Parameters
-dim           = 4   # Int Constant, the demension of the starting lattice
-size          = 6   # The size of the lattice along each dimension
+dim           = 2   # Int Constant, the demension of the starting lattice
+size          = 3   # The size of the lattice along each dimension
 nei           = 1   # the neighborhood which the vert. of lattice will connect
 p             = .3   # the rewiring probabillity
 hubThreshold  = 0.8 # The threshold of the centrality score for determing a hub
@@ -184,7 +197,7 @@ for( i in seq(from=1, to= trialCount, by=1)){
     swpSws = CalcSws(swpGraph, randGraph)
     PrintGraphStats(runCount, swpGraph, swpSws, randGraph, hubMatrix)
 #    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
-
+    rand_Model_Run =Run_Random_Model(swpGraph, randGraph, hubMatrix, timeSteps)
     # Increment for next run
     # ----------------------
     runCount = runCount + 1
