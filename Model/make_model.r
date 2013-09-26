@@ -4,10 +4,9 @@
 library(igraph)
 library(base)
 
-#################################################
-############### Defined Functions ###############
-#################################################
-
+################################################################################
+############################## Defined Functions ###############################
+################################################################################
 # Function to Generate Small World Graph
 MakeSWPNetwork <- function(dim,size,nei,p){
   swpGraph <- watts.strogatz.game(dim,size,nei,p, loops = FALSE, multiple = FALSE)
@@ -74,6 +73,30 @@ CalcSdelta <- function(swpGraph, randGraph){
   print(swpMatrix)
 }
 
+################################################################################
+##############################  Models Functions  ##############################
+################################################################################
+Run_Random_Model <- function(swpGraph, randGraph, hubMatrix){
+  # Model Switches
+  # swpGraph[j,k] <- FALSE    # Delete edge between j and k
+  # swpGraph[j,k] <- 1        # Add edge between j and k
+  # x<- sample(1:length(swpGraph), 1) #random select a number
+  # y<- sample(1:length(swpGraph), 1) # random select a number
+  # Call to print parameters
+  
+}
+
+Run_Hubs_Model <- function(swpGraph, randGraph, hubMatrix){
+
+}
+
+Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
+
+}
+
+################################################################################
+############################## Printing Functions ##############################
+################################################################################
 PrintGraphStats <- function(runCount, swpGraph, swpSws, randGraph, hubMatrix){
   # Generate output file of each run in each run directory
   outfileName = "../cumulative_attributes.txt"   
@@ -113,11 +136,9 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
   plot(randGraph)
 }
 
-
-#################################################
-############## Execition Code ###################
-#################################################
-
+################################################################################
+################################ Execution Code ################################
+################################################################################
 # Number of runs
 trialCount= 10
 
@@ -125,7 +146,7 @@ trialCount= 10
 dim           = 4   # Int Constant, the demension of the starting lattice
 size          = 6   # The size of the lattice along each dimension
 nei           = 1   # the neighborhood which the vert. of lattice will connect
-p             = 1   # the rewiring probabillity
+p             = .3   # the rewiring probabillity
 hubThreshold  = 0.8 # The threshold of the centrality score for determing a hub
 
 
