@@ -77,21 +77,22 @@ CalcSdelta <- function(swpGraph, randGraph){
 ##############################  Models Functions  ##############################
 ################################################################################
 Run_Random_Model <- function(swpGraph, randGraph, hubMatrix, timeSteps){
+  # Loops the model for specified amount of time (timeSteps)
   for ( step in seq(from=1, to=timeSteps, by=1)){
     x<- sample(1:length(swpGraph), 1) # random int
     y<- sample(1:length(swpGraph), 1) # random int
     z<- sample(1:length(swpGraph), 1) # random int
-  
+    # Re-selects x and y if they don't have an edge between them.  
     while( swpGraph[x,y] == 0){
-      x<- sample(1:length(swpGraph), 1) # random connected
-      y<- sample(1:length(swpGraph), 1) # random connected
+      x<- sample(1:length(swpGraph), 1)
+      y<- sample(1:length(swpGraph), 1) 
     }
     swpGraph[x,y] <- FALSE              # Remove edge between x and y
-  
-    while( swpGraph[x,z] == 1){
-      z<- sample(1:length(swpGraph), 1) # random int not connected
-    }
     
+    # Loops new z values until x and z don't have an edge
+    while( swpGraph[x,z] == 1){
+      z<- sample(1:length(swpGraph), 1)
+          }
     swpGraph[x,z] <- 1                  # Add edge between x and z
     
     print(swpGraph[])
@@ -109,24 +110,29 @@ Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
 ################################################################################
 ############################## Printing Functions ##############################
 ################################################################################
-PrintGraphStats <- function(runCount, swpGraph, swpSws, randGraph, hubMatrix){
+PrintGraphStats <- function(runCount, swpGraph, swpSws, randGraph, hubMatrix,
+                            dim, size, nei, p, hubThreshold){
   # Generate output file of each run in each run directory
   outfileName = "../cumulative_attributes.txt"   
     
   for (i in seq(from=1, to=2, by=1)){
-    write('runCount: ', file= outfileName, append = TRUE, sep= ", ")
-    write(runCount, file= outfileName, append = TRUE, sep= ", ")
-    write('swpGraph Vertice count: ', file= outfileName, append = TRUE, sep= ", ")
-    write(vcount(swpGraph), file= outfileName, append = TRUE,  sep= ", ")
-    write('swpGraph Edge count: ', file= outfileName, append = TRUE, sep= ", ")
-    write(ecount(swpGraph), file= outfileName, append = TRUE,  sep= ", ")
-    write('swpGraph Sws: ', file= outfileName, append = TRUE, sep= ", ")
-    write(swpSws , file= outfileName, append = TRUE,  sep= ", ")
-    write('swpGraph Hub count: ', file= outfileName, append = TRUE, sep= ", ")
-    count = sum(hubMatrix == 1)
-    write(count, file= outfileName, append = TRUE,  sep= ", ")
+    write(paste('runCount: ', runCount), file= outfileName, append = TRUE, sep= ", ")
+    write(paste('Dim: ', dim), file= outfileName, append = TRUE, sep= ", ")
+    write(paste('Size: ',size), file= outfileName, append = TRUE, sep= ", ")
+    write(paste('Nei: ', nei), file= outfileName, append = TRUE, sep= ", ")
+    write(paste('p: ',p), file= outfileName, append = TRUE, sep= ", ")
+    write(paste('hubThreshold: ', hubThreshold), file= outfileName,
+          append = TRUE, sep= ", ")
+    write(paste('swpGraph Vertice count: ', vcount(swpGraph)), file= outfileName,
+          append = TRUE, sep= ", ")
+    write(paste('swpGraph Edge count: ',ecount(swpGraph)), file= outfileName, 
+          append = TRUE, sep= ", ")
+    write(paste('swpGraph Sws: ', swpSws), file= outfileName, append = TRUE, 
+          sep= ", ")
+    write(paste('swpGraph Hub count: ', sum(hubMatrix == 1)), file= outfileName,
+          append = TRUE, sep= ", ")
     write('', file= outfileName, append = TRUE)
-
+    
     outfileName = paste('output_run',i,'.txt', sep="")
     }
 }
@@ -195,7 +201,7 @@ for( i in seq(from=1, to= trialCount, by=1)){
     # ------------------------
     hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
     swpSws = CalcSws(swpGraph, randGraph)
-    PrintGraphStats(runCount, swpGraph, swpSws, randGraph, hubMatrix)
+    PrintGraphStats(runCount, swpGraph, swpSws, randGraph, hubMatrix, dim, size, nei, p,                             hubThreshold)
 #    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
     rand_Model_Run =Run_Random_Model(swpGraph, randGraph, hubMatrix, timeSteps)
     # Increment for next run
