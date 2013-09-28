@@ -52,8 +52,10 @@ CalcSws <- function(swpGraph, randGraph){
   lambda = (swpLambda / randLambda)  # Combines to get the ratio Lambda value
 
   Sws = (gamma/lambda) # Calculates S^WS from the ratio.
-
-  return(Sws)
+  
+  swsList <- list("Sws" = Sws, "swpPathLength" = swpLambda, 
+                  "swpClustering" = swpGamma)
+  return(swsCalc)
 }
 
 # Might forget about this for a bit to focus on more important parts of the model.
@@ -76,7 +78,10 @@ CalcSdelta <- function(swpGraph, randGraph){
 ################################################################################
 ##############################  Models Functions  ##############################
 ################################################################################
-Run_Random_Model <- function(runCount, swpGraph, randGraph, hubMatrix, timeSteps){
+
+# Random Model Run. Randomly moves edges.
+Run_Random_Model <- function(runCount, swpGraph, randGraph, swpCalc, hubMatrix,
+                             timeSteps){
   runLogOutput = paste('run',runCount,'_logOutput.txt', sep="")
   write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Clustering'), 
         file= runLogOutput, append = TRUE, sep=",")
@@ -208,11 +213,12 @@ for( i in seq(from=1, to= trialCount, by=1)){
     # Run functions on Graphs
     # ------------------------
     hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
-    swpSws = CalcSws(swpGraph, randGraph)
-    PrintGraphStats(runCount, swpGraph, swpSws, randGraph, hubMatrix, dim, size, nei, p,
-                    hubThreshold)
+    swsCalc = CalcSws(swpGraph, randGraph)
+    PrintGraphStats(runCount, swpGraph, swpSws, randGraph, hubMatrix, dim, size,
+                    nei, p,  hubThreshold)
 #    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
-    rand_Model_Run =Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix, timeSteps)
+    rand_Model_Run =Run_Random_Model(runCount,swpGraph, randGraph, swsCalc, 
+                                     hubMatrix, timeSteps)
     # Increment for next run
     # ----------------------
     runCount = runCount + 1
