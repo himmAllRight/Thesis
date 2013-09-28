@@ -76,7 +76,11 @@ CalcSdelta <- function(swpGraph, randGraph){
 ################################################################################
 ##############################  Models Functions  ##############################
 ################################################################################
-Run_Random_Model <- function(swpGraph, randGraph, hubMatrix, timeSteps){
+Run_Random_Model <- function(runCount, swpGraph, randGraph, hubMatrix, timeSteps){
+  runLogOutput = paste('run',runCount,'_logOutput.txt', sep="")
+  write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Clustering'), 
+        file= runLogOutput, append = TRUE, sep=",")
+
   # Loops the model for specified amount of time (timeSteps)
   for ( step in seq(from=1, to=timeSteps, by=1)){
     x<- sample(1:length(swpGraph), 1) # random int
@@ -95,10 +99,18 @@ Run_Random_Model <- function(swpGraph, randGraph, hubMatrix, timeSteps){
           }
     swpGraph[x,z] <- 1                  # Add edge between x and z
     
-    print(swpGraph[])
+#    print(swpGraph[])
+  print(step)
+  # Print attributes to output file
+  # -------------------------------
+  swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL)
+  write(paste(step,'\t',HubCounts(FindHubs(runCount, hubThreshold, swpGraph)),
+        '\t', CalcSws(swpGraph, randGraph),'\t', average.path.length(swpGraph),
+        '\t',swpGamma), file= runLogOutput, append = TRUE, sep="," )
   }
-} 
+ 
 
+}
 Run_Hubs_Model <- function(swpGraph, randGraph, hubMatrix){
 
 }
@@ -158,22 +170,18 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
 ################################ Execution Code ################################
 ################################################################################
 # Number of runs
-trialCount= 10
-timeSteps = 25
+trialCount= 3
+timeSteps = 1000
 
 ## Model Parameters
-dim           = 2   # Int Constant, the demension of the starting lattice
-size          = 3   # The size of the lattice along each dimension
+dim           = 4   # Int Constant, the demension of the starting lattice
+size          = 5   # The size of the lattice along each dimension
 nei           = 1   # the neighborhood which the vert. of lattice will connect
 p             = .3   # the rewiring probabillity
 hubThreshold  = 0.8 # The threshold of the centrality score for determing a hub
 
 
 # Generate Directories for all trials
-#  print(paste('mkdir model_run',i, sep=""))
-#  system(paste('mkdir model_run',i, sep=""))
-
-
 runCount =1
 for( i in seq(from=1, to= trialCount, by=1)){
   print(getwd()) # print current working directory
@@ -195,15 +203,16 @@ for( i in seq(from=1, to= trialCount, by=1)){
     swpGraph = MakeSWPNetwork(dim,size,nei,p)
     randGraph = MakeRandNetwork(dim, size, nei, swpGraph)
     if(CalcSws(swpGraph, randGraph) > 1) notSWP = FALSE
-    }
+    }    
     
     # Run functions on Graphs
     # ------------------------
     hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
     swpSws = CalcSws(swpGraph, randGraph)
-    PrintGraphStats(runCount, swpGraph, swpSws, randGraph, hubMatrix, dim, size, nei, p,                             hubThreshold)
+    PrintGraphStats(runCount, swpGraph, swpSws, randGraph, hubMatrix, dim, size, nei, p,
+                    hubThreshold)
 #    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
-    rand_Model_Run =Run_Random_Model(swpGraph, randGraph, hubMatrix, timeSteps)
+    rand_Model_Run =Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix, timeSteps)
     # Increment for next run
     # ----------------------
     runCount = runCount + 1
