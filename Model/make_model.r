@@ -55,42 +55,27 @@ CalcSws <- function(swpGraph, randGraph){
   
   swsList <- list("Sws" = Sws, "swpPathLength" = swpLambda, 
                   "swpClustering" = swpGamma)
-  return(swsCalc)
+  return(swsList)
 }
 
-# Might forget about this for a bit to focus on more important parts of the model.
-# It might slow things down alot if I code it by myself by hand. (high complexity)
-# Calculate S^delta
-CalcSdelta <- function(swpGraph, randGraph){
-  # Calculate LamdaG (LamdaG = Lg / Lrand)
-  Lg     = average.path.length(swpGraph, directed = FALSE)
-  Lrand  = average.path.length(randGraph, directed = FALSE)
-  LamdaG = ( Lg / Lrand )
-  # Calculate GammaDeltaG ( GammaDeltaG = cDeltaG / cDeltaRand )
-  
-  # Find a way to determine the number of triangles in a graph. 
-  print("Triangle Stuff")
-  # Generates adjacency matrix of graph that is used to find all triangles.
-  swpMatrix = get.adjacency(swpGraph, type=c("upper"))  
-  print(swpMatrix)
-}
 
 ################################################################################
 ##############################  Models Functions  ##############################
 ################################################################################
 
 # Random Model Run. Randomly moves edges.
-Run_Random_Model <- function(runCount, swpGraph, randGraph, swpCalc, hubMatrix,
+Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
                              timeSteps){
   runLogOutput = paste('run',runCount,'_logOutput.txt', sep="")
   write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Clustering'), 
         file= runLogOutput, append = TRUE, sep=",")
-
+  
   # Loops the model for specified amount of time (timeSteps)
   for ( step in seq(from=1, to=timeSteps, by=1)){
     x<- sample(1:length(swpGraph), 1) # random int
     y<- sample(1:length(swpGraph), 1) # random int
     z<- sample(1:length(swpGraph), 1) # random int
+    
     # Re-selects x and y if they don't have an edge between them.  
     while( swpGraph[x,y] == 0){
       x<- sample(1:length(swpGraph), 1)
@@ -105,13 +90,15 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph, swpCalc, hubMatrix,
     swpGraph[x,z] <- 1                  # Add edge between x and z
     
 #    print(swpGraph[])
-  print(step)
-  # Print attributes to output file
-  # -------------------------------
-  swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL)
-  write(paste(step,'\t',HubCounts(FindHubs(runCount, hubThreshold, swpGraph)),
-        '\t', CalcSws(swpGraph, randGraph),'\t', average.path.length(swpGraph),
-        '\t',swpGamma), file= runLogOutput, append = TRUE, sep="," )
+    print(step)
+    
+    # Print attributes to output file
+    # -------------------------------
+    swsList = CalcSws(swpGraph,randGraph)
+    swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL)
+    write(paste(step,'\t',HubCounts(FindHubs(runCount, hubThreshold, swpGraph)),
+          '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
+          swsList$swpClustering), file= runLogOutput, append = TRUE, sep="," )
   }
  
 
@@ -120,15 +107,59 @@ Run_Hubs_Model <- function(swpGraph, randGraph, hubMatrix){
 
 }
 
+# Runs a model that only progresses forward if it increases pathlength.
 Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
 
+  runLogOutput = paste('run',runCount,'_logOutput.txt', sep="")
+  write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Clustering'), 
+        file= runLogOutput, append = TRUE, sep=",")
+
+  old_PathLength = average.path.length(swpGraph)
+  model_Drive = TRUE
+  while(model_Drive){
+    # Loops the model for specified amount of time (timeSteps)
+    for ( step in seq(from=1, to=timeSteps, by=1)){
+#      x<- sample(1:length(swpGraph), 1) # random int
+#      y<- sample(1:length(swpGraph), 1) # random int
+#      z<- sample(1:length(swpGraph), 1) # random int
+      vertSwapList <- list("x" = sample(1:length(swpGraph), 1),
+                           "y" = sample(1:length(swpGraph), 1),
+                           "z" = sample(1:length(swpGraph), 1))
+
+      # Re-selects x and y if they don't have an edge between them.  
+      while( swpGraph[vertSwapList$x,vertSwapList$y] == 0){
+        vertSwapList$x <- sample(1:length(swpGraph), 1)
+        vertSwapList$y <- sample(1:length(swpGraph), 1)
+      }
+      # Remove edge between x and y
+      swpGraph[vertSwapList$x,vertSwapList$y] <- FALSE
+
+      # Loops new z values until x and z don't have an edge
+      while( swpGraph[vertSwapList$x,vertSwapList$z] == 1){
+        vertSwapList$z <- sample(1:length(swpGraph), 1)
+        }
+      
+      # Add edge between x and z
+      swpGraph[vertSwapList$x,vertSwapList$z] <- 1
+
+  # Print attributes to output file
+    # -------------------------------
+      swsList = CalcSws(swpGraph,randGraph)
+      swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL)
+      write(paste(step,'\t',HubCounts(FindHubs(runCount, hubThreshold, swpGraph)),
+            '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
+            swsList$swpClustering), file= runLogOutput, append = TRUE, sep="," )
+    } 
+    if(average.path.length(swpGraph)
+  swpLambda = average.path.length(swpGraph)
+  }
 }
 
 ################################################################################
 ############################## Printing Functions ##############################
 ################################################################################
-PrintGraphStats <- function(runCount, swpGraph, swpSws, randGraph, hubMatrix,
-                            dim, size, nei, p, hubThreshold){
+PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dim, size,
+                            nei, p, hubThreshold){
   # Generate output file of each run in each run directory
   outfileName = "../cumulative_attributes.txt"   
     
@@ -144,7 +175,7 @@ PrintGraphStats <- function(runCount, swpGraph, swpSws, randGraph, hubMatrix,
           append = TRUE, sep= ", ")
     write(paste('swpGraph Edge count: ',ecount(swpGraph)), file= outfileName, 
           append = TRUE, sep= ", ")
-    write(paste('swpGraph Sws: ', swpSws), file= outfileName, append = TRUE, 
+    write(paste('swpGraph Sws: ', CalcSws(swpGraph, randGraph)$Sws), file= outfileName, append = TRUE, 
           sep= ", ")
     write(paste('swpGraph Hub count: ', sum(hubMatrix == 1)), file= outfileName,
           append = TRUE, sep= ", ")
@@ -207,18 +238,18 @@ for( i in seq(from=1, to= trialCount, by=1)){
     print("redo")
     swpGraph = MakeSWPNetwork(dim,size,nei,p)
     randGraph = MakeRandNetwork(dim, size, nei, swpGraph)
-    if(CalcSws(swpGraph, randGraph) > 1) notSWP = FALSE
+    if(CalcSws(swpGraph, randGraph)$Sws > 1) notSWP = FALSE
     }    
     
     # Run functions on Graphs
     # ------------------------
     hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
-    swsCalc = CalcSws(swpGraph, randGraph)
-    PrintGraphStats(runCount, swpGraph, swpSws, randGraph, hubMatrix, dim, size,
-                    nei, p,  hubThreshold)
+   # CalcSws = CalcSws(swpGraph, randGraph)
+    PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, dim, size, nei, p,
+                  hubThreshold)
 #    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
-    rand_Model_Run =Run_Random_Model(runCount,swpGraph, randGraph, swsCalc, 
-                                     hubMatrix, timeSteps)
+    rand_Model_Run =Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
+                                     timeSteps)
     # Increment for next run
     # ----------------------
     runCount = runCount + 1
