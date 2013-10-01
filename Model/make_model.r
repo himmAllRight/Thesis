@@ -129,7 +129,7 @@ Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
       y <- sample(vertCount[which(!(vertCount%in%triedYList))], 1) # random int
       z <- sample(vertCount[which(!(vertCount%in%triedZList))], 1) # random int
 
-        # Re-selects x and y if they don't have an edge between them.  
+#         Re-selects x and y if they don't have an edge between them.  
         while( swpGraph[x,y] == 0){
           x <- sample(1:length(swpGraph), 1)
           y <- sample(1:length(swpGraph), 1)
