@@ -114,34 +114,47 @@ Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
   write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Clustering'), 
         file= runLogOutput, append = TRUE, sep=",")
 
-  old_PathLength = average.path.length(swpGraph)
-  model_Drive = TRUE
-  while(model_Drive){
-    # Loops the model for specified amount of time (timeSteps)
-    for ( step in seq(from=1, to=timeSteps, by=1)){
-#      x<- sample(1:length(swpGraph), 1) # random int
-#      y<- sample(1:length(swpGraph), 1) # random int
-#      z<- sample(1:length(swpGraph), 1) # random int
-      vertSwapList <- list("x" = sample(1:length(swpGraph), 1),
-                           "y" = sample(1:length(swpGraph), 1),
-                           "z" = sample(1:length(swpGraph), 1))
+  # Loops the model for specified amount of time (timeSteps)
+  for ( step in seq(from=1, to=timeSteps, by=1)){
+    print(step)
+    old_PathLength = average.path.length(swpGraph)
+    model_Drive = TRUE
+    triedList <- list()
+    tryCount = 1
+    while(model_Drive){
+      x<- sample(1:length(swpGraph), 1) # random int
+      y<- sample(1:length(swpGraph), 1) # random int
+      z<- sample(1:length(swpGraph), 1) # random int
+#        vertSwapList <- list("x" = sample(1:length(swpGraph), 1),
+#                             "y" = sample(1:length(swpGraph), 1),
+#                             "z" = sample(1:length(swpGraph), 1))
 
-      # Re-selects x and y if they don't have an edge between them.  
-      while( swpGraph[vertSwapList$x,vertSwapList$y] == 0){
-        vertSwapList$x <- sample(1:length(swpGraph), 1)
-        vertSwapList$y <- sample(1:length(swpGraph), 1)
-      }
-      # Remove edge between x and y
-      swpGraph[vertSwapList$x,vertSwapList$y] <- FALSE
+        # Re-selects x and y if they don't have an edge between them.  
+        while( swpGraph[x,y] == 0){
+          x <- sample(1:length(swpGraph), 1)
+          y <- sample(1:length(swpGraph), 1)
+          }
+        # Remove edge between x and y
+        swpGraph[x,y] <- FALSE
 
-      # Loops new z values until x and z don't have an edge
-      while( swpGraph[vertSwapList$x,vertSwapList$z] == 1){
-        vertSwapList$z <- sample(1:length(swpGraph), 1)
-        }
+        # Loops new z values until x and z don't have an edge
+        while( swpGraph[x,z] == 1){
+          z <- sample(1:length(swpGraph), 1)
+          }
       
-      # Add edge between x and z
-      swpGraph[vertSwapList$x,vertSwapList$z] <- 1
+        # Add edge between x and z
+        swpGraph[x,z] <- 1
 
+      if(average.path.length(swpGraph) > old_PathLength &&
+         !(x %in% triedList && y %in% triedList && z %in% triedList)){
+        model_Drive = FALSE
+        print(average.path.length(swpGraph))
+        } else{
+            triedList[[tryCount]] <- list('x' = x, 'y' = y, 'z' = z)
+            tryCount = tryCount + 1
+            print(paste("Size of tried List:", length(triedList)))
+        }
+    }
   # Print attributes to output file
     # -------------------------------
       swsList = CalcSws(swpGraph,randGraph)
@@ -150,9 +163,6 @@ Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
             '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
             swsList$swpClustering), file= runLogOutput, append = TRUE, sep="," )
     } 
-    if(average.path.length(swpGraph)
-  swpLambda = average.path.length(swpGraph)
-  }
 }
 
 ################################################################################
@@ -248,8 +258,11 @@ for( i in seq(from=1, to= trialCount, by=1)){
     PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, dim, size, nei, p,
                   hubThreshold)
 #    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
-    rand_Model_Run =Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
-                                     timeSteps)
+#    rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
+#                                     timeSteps)
+ 
+    pathLength_Model_Run = Run_PathLength_Model(swpGraph, randGraph, hubMatrix)
+
     # Increment for next run
     # ----------------------
     runCount = runCount + 1
