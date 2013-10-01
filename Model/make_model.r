@@ -119,7 +119,9 @@ Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
     print(step)
     old_PathLength = average.path.length(swpGraph)
     model_Drive = TRUE
-    triedList <- list()
+    triedXList <- list()
+    triedYList <- list()
+    triedZList <- list()
     tryCount = 1
     while(model_Drive){
       x<- sample(1:length(swpGraph), 1) # random int
@@ -145,12 +147,14 @@ Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
         # Add edge between x and z
         swpGraph[x,z] <- 1
 
-      if(average.path.length(swpGraph) > old_PathLength &&
-         !(x %in% triedList && y %in% triedList && z %in% triedList)){
+      if(average.path.length(swpGraph) > old_PathLength){ # &&
+#         !(x %in% triedList && y %in% triedList && z %in% triedList)){
         model_Drive = FALSE
         print(average.path.length(swpGraph))
         } else{
-            triedList[[tryCount]] <- list('x' = x, 'y' = y, 'z' = z)
+            triedXList[[tryCount]] = x
+            triedYList[[tryCount]] = y
+            triedZList[[tryCount]] = z
             tryCount = tryCount + 1
             print(paste("Size of tried List:", length(triedList)))
         }
