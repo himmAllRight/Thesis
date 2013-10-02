@@ -119,28 +119,22 @@ Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
     print(step)
     old_PathLength = average.path.length(swpGraph)
     model_Drive = TRUE
-    triedXList <- c()
-    triedYList <- c()
-    triedZList <- c()
     tryCount = 1
+ 
     while(model_Drive){
       vertCount = c(1:length(swpGraph))
-      x <- sample(vertCount[which(!(vertCount%in%triedXList))], 1) # random int
-      y <- sample(vertCount[which(!(vertCount%in%triedYList))], 1) # random int
-      z <- sample(vertCount[which(!(vertCount%in%triedZList))], 1) # random int
+      swpEdgeList <- get.edgelist(swpGraph, names = TRUE)
+      x <- swpEdgeList[,1]
+      y <- swpEdgeList[,2]
+      z <- sample(1:length(swpGraph), 1) # random int
 
-#         Re-selects x and y if they don't have an edge between them.  
-        while( swpGraph[x,y] == 0){
-          x <- sample(1:length(swpGraph), 1)
-          y <- sample(1:length(swpGraph), 1)
-          }
-        # Remove edge between x and y
-        swpGraph[x,y] <- FALSE
+      # Remove edge between x and y
+      swpGraph[x,y] <- FALSE
 
-        # Loops new z values until x and z don't have an edge
-        while( swpGraph[x,z] == 1){
-          z <- sample(1:length(swpGraph), 1)
-          }
+      # Loops new z values until x and z don't have an edge
+      while( swpGraph[x,z] == 1){
+        z <- sample(1:length(swpGraph), 1)
+        }
       
         # Add edge between x and z
         swpGraph[x,z] <- 1
@@ -150,9 +144,7 @@ Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
         model_Drive = FALSE
         print(average.path.length(swpGraph))
         } else{
-            triedXList <- append(triedXList, x)
-            triedYList <- append(triedYList, y)
-            triedZList <- append(triedZList, z)
+            print(paste("Try: ", tryCount))
             tryCount = tryCount + 1
         }
     }
