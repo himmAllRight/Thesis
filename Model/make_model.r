@@ -102,10 +102,35 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
   }
 }
 
+
 # Run model that attacks the hubs first.
 Run_Hubs_Model <- function(swpGraph, randGraph, hubMatrix){
+  # Returns a list of the vertex number of all the hubs. 
+  hubInd = (which(hubMatrix %in% 1))
+  nonHubs <- which(!(1:length(hubMatrix) %in% hubInd)
+
+  x <- sample(hubInd, 1)    # Random Hub Node
+  y <- sample(hubInd, 1)    # Random Hub Node
+  
+  swpGraph[x,y] <- False    # Remove connection between hubs
+  
+  while( swpGraph[x,z] == 1){
+    z <- sample(nonHubs, 1) # Random Non-hub  
+  }
+  swpGraph[x,z] <- 1        # Add connection from hub to non hub
+
+  print(step)
+    
+    # Print attributes to output file
+    # -------------------------------
+    swsList = CalcSws(swpGraph,randGraph)
+    swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL)
+    write(paste(step,'\t',HubCounts(FindHubs(runCount, hubThreshold, swpGraph)),
+          '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
+          swsList$swpClustering), file= runLogOutput, append = TRUE, sep="," )
 
 }
+
 
 # Runs a model that only progresses forward if it increases pathlength.
 Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
@@ -214,7 +239,7 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
 ################################################################################
 # Number of runs
 trialCount= 3
-timeSteps = 20
+timeSteps = 15 
 
 ## Model Parameters
 dim           = 4   # Int Constant, the demension of the starting lattice
