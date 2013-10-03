@@ -58,7 +58,6 @@ CalcSws <- function(swpGraph, randGraph){
   return(swsList)
 }
 
-
 ################################################################################
 ##############################  Models Functions  ##############################
 ################################################################################
@@ -102,24 +101,29 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
   }
 }
 
-
 # Run model that attacks the hubs first.
-Run_Hubs_Model <- function(swpGraph, randGraph, hubMatrix){
+Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold, 
+                           timeSteps){
   # Returns a list of the vertex number of all the hubs. 
-  hubInd = (which(hubMatrix %in% 1))
-  nonHubs <- which(!(1:length(hubMatrix) %in% hubInd)
+  
+  for(step in seq(from=1, to=timeSteps, by=1)){
+    hubMatrix <- FindHubs(runCount, hubThreshold, swpGraph)
+    
+    hubInd = (which(hubMatrix %in% 1))
+    nonHubs <- which(!(1:length(hubMatrix) %in% hubInd))
 
-  x <- sample(hubInd, 1)    # Random Hub Node
-  y <- sample(hubInd, 1)    # Random Hub Node
+    x <- sample(hubInd, 1)    # Random Hub Node
+    y <- sample(hubInd, 1)    # Random Hub Node
   
-  swpGraph[x,y] <- False    # Remove connection between hubs
+    swpGraph[x,y] <- False    # Remove connection between hubs
   
-  while( swpGraph[x,z] == 1){
-    z <- sample(nonHubs, 1) # Random Non-hub  
+    while( swpGraph[x,z] == 1){
+      z <- sample(nonHubs, 1) # Random Non-hub  
+    } 
+    swpGraph[x,z] <- 1        # Add connection from hub to non hub
+
+    print(step)
   }
-  swpGraph[x,z] <- 1        # Add connection from hub to non hub
-
-  print(step)
     
     # Print attributes to output file
     # -------------------------------
@@ -130,7 +134,7 @@ Run_Hubs_Model <- function(swpGraph, randGraph, hubMatrix){
           swsList$swpClustering), file= runLogOutput, append = TRUE, sep="," )
 
 }
-
+print("here?")
 
 # Runs a model that only progresses forward if it increases pathlength.
 Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
@@ -248,7 +252,6 @@ nei           = 1   # the neighborhood which the vert. of lattice will connect
 p             = .3   # the rewiring probabillity
 hubThreshold  = 0.8 # The threshold of the centrality score for determing a hub
 
-
 # Generate Directories for all trials
 runCount =1
 for( i in seq(from=1, to= trialCount, by=1)){
@@ -273,17 +276,20 @@ for( i in seq(from=1, to= trialCount, by=1)){
     if(CalcSws(swpGraph, randGraph)$Sws > 1) notSWP = FALSE
     }    
     
+
     # Run functions on Graphs
     # ------------------------
     hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
    # CalcSws = CalcSws(swpGraph, randGraph)
     PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, dim, size, nei, p,
-                  hubThreshold)
+                    hubThreshold)
 #    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
-#    rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
-#                                     timeSteps)
+    rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
+                                     timeSteps)
  
-    pathLength_Model_Run = Run_PathLength_Model(swpGraph, randGraph, hubMatrix)
+#    Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubMatrix, 
+#                               timeSteps){
+#    pathLength_Model_Run = Run_PathLength_Model(swpGraph, randGraph, hubMatrix)
 
     # Increment for next run
     # ----------------------
