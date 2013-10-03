@@ -100,63 +100,67 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
           '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
           swsList$swpClustering), file= runLogOutput, append = TRUE, sep="," )
   }
- 
-
 }
+
+# Run model that attacks the hubs first.
 Run_Hubs_Model <- function(swpGraph, randGraph, hubMatrix){
 
 }
 
 # Runs a model that only progresses forward if it increases pathlength.
 Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
-
+  # Sets up the output files
   runLogOutput = paste('run',runCount,'_logOutput.txt', sep="")
-  write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Clustering'), 
+  write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Clustering'),
         file= runLogOutput, append = TRUE, sep=",")
-
+  
   # Loops the model for specified amount of time (timeSteps)
   for ( step in seq(from=1, to=timeSteps, by=1)){
     print(step)
-    old_PathLength = average.path.length(swpGraph)
+    old_PathLength = average.path.length(swpGraph)   
     model_Drive = TRUE
     tryCount = 1
- 
+
+    # Drives model until the path length increases  
     while(model_Drive){
-      vertCount = c(1:length(swpGraph))
-      swpEdgeList <- get.edgelist(swpGraph, names = TRUE)
-      x <- swpEdgeList[,1]
-      y <- swpEdgeList[,2]
-      z <- sample(1:length(swpGraph), 1) # random int
-
-      # Remove edge between x and y
-      swpGraph[x,y] <- FALSE
-
+      x<- sample(1:length(swpGraph), 1) # random int
+      y<- sample(1:length(swpGraph), 1) # random int
+      z<- sample(1:length(swpGraph), 1) # random int
+    
+      # Re-selects x and y if they don't have an edge between them.  
+      while( swpGraph[x,y] == 0){
+        x <- sample(1:length(swpGraph), 1)
+        y <- sample(1:length(swpGraph), 1) 
+      }
+      swpGraph[x,y] <- FALSE              # Remove edge between x and y
+    
       # Loops new z values until x and z don't have an edge
       while( swpGraph[x,z] == 1){
         z <- sample(1:length(swpGraph), 1)
-        }
+      }
+      swpGraph[x,z] <- 1                  # Add edge between x and z
       
-        # Add edge between x and z
-        swpGraph[x,z] <- 1
-
-      if(average.path.length(swpGraph) > old_PathLength){ # &&
-#         !(x %in% triedList && y %in% triedList && z %in% triedList)){
+      # If new pathlength greater, move to next step.
+      if(average.path.length(swpGraph) > old_PathLength){
         model_Drive = FALSE
         print(average.path.length(swpGraph))
-        } else{
-            print(paste("Try: ", tryCount))
-            tryCount = tryCount + 1
-        }
-    }
-  # Print attributes to output file
+        old_PathLength = average.path.length(swpGraph)
+      } else {
+        print(paste("tryCount: ",tryCount," Step: ", step))
+        tryCount = tryCount + 1
+      }
+   }  
+        
+    # Print attributes to output file
     # -------------------------------
-      swsList = CalcSws(swpGraph,randGraph)
-      swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL)
-      write(paste(step,'\t',HubCounts(FindHubs(runCount, hubThreshold, swpGraph)),
-            '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
-            swsList$swpClustering), file= runLogOutput, append = TRUE, sep="," )
-    } 
+    swsList = CalcSws(swpGraph,randGraph)
+    swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL)
+    write(paste(step,'\t',HubCounts(FindHubs(runCount, hubThreshold, swpGraph)),
+          '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
+          swsList$swpClustering), file= runLogOutput, append = TRUE, sep="," )
+  }
 }
+
 
 ################################################################################
 ############################## Printing Functions ##############################
@@ -210,7 +214,7 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
 ################################################################################
 # Number of runs
 trialCount= 3
-timeSteps = 1000
+timeSteps = 20
 
 ## Model Parameters
 dim           = 4   # Int Constant, the demension of the starting lattice
