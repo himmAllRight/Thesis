@@ -104,18 +104,22 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
 # Run model that attacks the hubs first.
 Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold, 
                            timeSteps){
-  # Returns a list of the vertex number of all the hubs. 
-  
+  # Model Print Out 
+  runLogOutput = paste('run',runCount,'_logOutput.txt', sep="")
+  write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Clustering'), 
+        file= runLogOutput, append = TRUE, sep=",")
+
+ # Returns a list of the vertex number of all the hubs. 
   for(step in seq(from=1, to=timeSteps, by=1)){
-    hubMatrix <- FindHubs(runCount, hubThreshold, swpGraph)
-    
+    hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
     hubInd = (which(hubMatrix %in% 1))
     nonHubs <- which(!(1:length(hubMatrix) %in% hubInd))
 
     x <- sample(hubInd, 1)    # Random Hub Node
     y <- sample(hubInd, 1)    # Random Hub Node
-  
-    swpGraph[x,y] <- False    # Remove connection between hubs
+    z <- sample(nonHubs, 1)   # Random Non-hub  
+    
+    swpGraph[x,y] <- FALSE    # Remove connection between hubs
   
     while( swpGraph[x,z] == 1){
       z <- sample(nonHubs, 1) # Random Non-hub  
@@ -123,8 +127,8 @@ Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold,
     swpGraph[x,z] <- 1        # Add connection from hub to non hub
 
     print(step)
-  }
-    
+
+      
     # Print attributes to output file
     # -------------------------------
     swsList = CalcSws(swpGraph,randGraph)
@@ -132,9 +136,8 @@ Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold,
     write(paste(step,'\t',HubCounts(FindHubs(runCount, hubThreshold, swpGraph)),
           '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
           swsList$swpClustering), file= runLogOutput, append = TRUE, sep="," )
-
+    }
 }
-print("here?")
 
 # Runs a model that only progresses forward if it increases pathlength.
 Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
@@ -241,15 +244,23 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
 ################################################################################
 ################################ Execution Code ################################
 ################################################################################
+args <- commandArgs(TRUE)
+dim  <- as.integer(args[1])
+size <- as.integer(args[2])
+nei  <- as.integer(args[3])
+p    <- as.double(args[4])
+
+print(paste(dim, size, nei, p))
+
 # Number of runs
-trialCount= 3
-timeSteps = 15 
+trialCount= 3 
+timeSteps =500 
 
 ## Model Parameters
-dim           = 4   # Int Constant, the demension of the starting lattice
-size          = 5   # The size of the lattice along each dimension
-nei           = 1   # the neighborhood which the vert. of lattice will connect
-p             = .3   # the rewiring probabillity
+#dim           = 3   # Int Constant, the demension of the starting lattice
+#size          = 5   # The size of the lattice along each dimension
+#nei           = 1   # the neighborhood which the vert. of lattice will connect
+#p             = .3   # the rewiring probabillity
 hubThreshold  = 0.8 # The threshold of the centrality score for determing a hub
 
 # Generate Directories for all trials
@@ -257,9 +268,9 @@ runCount =1
 for( i in seq(from=1, to= trialCount, by=1)){
   print(getwd()) # print current working directory
   
-  print(paste('mkdir model_run',i, sep=""))
-  system(paste('mkdir model_run',i, sep=""))
-  setwd(paste('model_run',i, sep=""))
+  print(paste('mkdir path_model_run',i, sep=""))
+  system(paste('mkdir path_model_run',i, sep=""))
+  setwd(paste('path_model_run',i, sep=""))
   print(getwd())
 
   #-----------------------------------------------
@@ -287,8 +298,9 @@ for( i in seq(from=1, to= trialCount, by=1)){
     rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
                                      timeSteps)
  
-#    Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubMatrix, 
-#                               timeSteps){
+#    hubs_Model_run = Run_Hubs_Model(runCount, swpGraph, randGraph, hubThreshold, 
+#                           timeSteps)
+
 #    pathLength_Model_Run = Run_PathLength_Model(swpGraph, randGraph, hubMatrix)
 
     # Increment for next run
