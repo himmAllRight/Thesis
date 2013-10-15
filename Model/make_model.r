@@ -244,13 +244,21 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
 ################################################################################
 ################################ Execution Code ################################
 ################################################################################
-args <- commandArgs(TRUE)
-dim  <- as.integer(args[1])
-size <- as.integer(args[2])
-nei  <- as.integer(args[3])
-p    <- as.double(args[4])
+#args <- commandArgs(TRUE)
+#name <- as.string(args[1])
+#dim  <- as.integer(args[2])
+#size <- as.integer(args[3])
+#nei  <- as.integer(args[4])
+#p    <- as.double(args[5])
 
-print(paste(dim, size, nei, p))
+args <- commandArgs(trailingOnly = TRUE)
+name <- args[1]
+dim  <- args[2]
+size <- args[3]
+nei  <- args[4]
+p    <- args[5]
+
+#print(paste(name, dim, size, nei, p))
 
 # Number of runs
 trialCount= 3 
