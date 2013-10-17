@@ -8,15 +8,15 @@ library(base)
 ############################## Defined Functions ###############################
 ################################################################################
 # Function to Generate Small World Graph
-MakeSWPNetwork <- function(dim,size,nei,p){
-  swpGraph <- watts.strogatz.game(dim,size,nei,p, loops = FALSE, multiple = FALSE)
+MakeSWPNetwork <- function(dimension,size,nei,p){
+  swpGraph <- watts.strogatz.game(dimension,size,nei,p, loops = FALSE, multiple = FALSE)
   return(swpGraph)
 }
 
 # Function to Generate an Erdos-Renyi random graph
-MakeRandNetwork <- function(dim, size, nei, swpGraph){
+MakeRandNetwork <- function(dimension, size, nei, swpGraph){
   # Try to make a random graph with the watts.strogatz.game function
-  randGraph <- watts.strogatz.game(dim,size,nei,1,loops = FALSE, multiple = FALSE)
+  randGraph <- watts.strogatz.game(dimension,size,nei,1,loops = FALSE, multiple = FALSE)
   return(randGraph)
 }
 
@@ -41,9 +41,9 @@ HubCounts <- function(hubMatrix){
 CalcSws <- function(swpGraph, randGraph){
   # Calculates clustering coefficients of swp and rand graphs
   swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL,
-                            isolates="zero") 
+                            isolates="zero")								
   randGamma = transitivity(randGraph, type="global", vids=NULL, weights=NULL,
-                           isolates="zero")
+                           isolates="zero")                         
   gamma = (swpGamma/randGamma) # combines them to get the Gamma value.
 
   # Calculates the mean minmal path length for swp and corresponding rand graphs
@@ -197,14 +197,14 @@ Run_PathLength_Model <- function(swpGraph, randGraph, hubMatrix){
 ################################################################################
 ############################## Printing Functions ##############################
 ################################################################################
-PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dim, size,
+PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dimension, size,
                             nei, p, hubThreshold){
   # Generate output file of each run in each run directory
   outfileName = "../cumulative_attributes.txt"   
     
   for (i in seq(from=1, to=2, by=1)){
     write(paste('runCount: ', runCount), file= outfileName, append = TRUE, sep= ", ")
-    write(paste('Dim: ', dim), file= outfileName, append = TRUE, sep= ", ")
+    write(paste('dimension: ', dimension), file= outfileName, append = TRUE, sep= ", ")
     write(paste('Size: ',size), file= outfileName, append = TRUE, sep= ", ")
     write(paste('Nei: ', nei), file= outfileName, append = TRUE, sep= ", ")
     write(paste('p: ',p), file= outfileName, append = TRUE, sep= ", ")
@@ -244,41 +244,31 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
 ################################################################################
 ################################ Execution Code ################################
 ################################################################################
-#args <- commandArgs(TRUE)
-#name <- as.string(args[1])
-#dim  <- as.integer(args[2])
-#size <- as.integer(args[3])
-#nei  <- as.integer(args[4])
-#p    <- as.double(args[5])
-
 args <- commandArgs(trailingOnly = TRUE)
 name <- args[1]
-dim  <- args[2]
-size <- args[3]
-nei  <- args[4]
-p    <- args[5]
-
-#print(paste(name, dim, size, nei, p))
+dimension  <- as.numeric(args[2])
+size <- as.numeric(args[3])
+nei  <- as.numeric(args[4])
+p    <- as.numeric(args[5])
 
 # Number of runs
-trialCount= 3 
-timeSteps =500 
+trialCount= as.numeric(args[6])
+timeSteps = as.numeric(args[7])
 
-## Model Parameters
-#dim           = 3   # Int Constant, the demension of the starting lattice
-#size          = 5   # The size of the lattice along each dimension
-#nei           = 1   # the neighborhood which the vert. of lattice will connect
-#p             = .3   # the rewiring probabillity
+test = 7
+
 hubThreshold  = 0.8 # The threshold of the centrality score for determing a hub
 
 # Generate Directories for all trials
 runCount =1
+
 for( i in seq(from=1, to= trialCount, by=1)){
+
   print(getwd()) # print current working directory
   
-  print(paste('mkdir path_model_run',i, sep=""))
-  system(paste('mkdir path_model_run',i, sep=""))
-  setwd(paste('path_model_run',i, sep=""))
+  print(paste('mkdir ',name, sep=""))
+  system(paste('mkdir ', name, sep=""))
+  setwd(paste(name, sep=""))
   print(getwd())
 
   #-----------------------------------------------
@@ -287,12 +277,20 @@ for( i in seq(from=1, to= trialCount, by=1)){
 
   # Generate Graphs
   # ----------------
-  notSWP = TRUE # true if the graphs are not swp
+  notSWP      = TRUE # true if the graphs are not swp
+  notSWPCount = 0
   while(notSWP){
     print("redo")
-    swpGraph = MakeSWPNetwork(dim,size,nei,p)
-    randGraph = MakeRandNetwork(dim, size, nei, swpGraph)
-    if(CalcSws(swpGraph, randGraph)$Sws > 1) notSWP = FALSE
+    notSWPCount = notSWPCount + 1
+    print(notSWPCount)
+    swpGraph = MakeSWPNetwork(dimension,size,nei,p)
+    randGraph = MakeRandNetwork(dimension, size, nei, swpGraph)
+    if(CalcSws(swpGraph, randGraph)$Sws > 1) notSWP=FALSE
+    if(notSWPCount >= 1000){
+	  write(paste('Could not generate SWP graph in ', notSWPCount, 
+	  	            ' tries.'), file= 'failed.txt', append = TRUE, sep= ", ")
+	  quit(save = "no")
+    }
     }    
     
 
@@ -300,9 +298,9 @@ for( i in seq(from=1, to= trialCount, by=1)){
     # ------------------------
     hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
    # CalcSws = CalcSws(swpGraph, randGraph)
-    PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, dim, size, nei, p,
+    PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, dimension, size, nei, p,
                     hubThreshold)
-#    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
+    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
     rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
                                      timeSteps)
  
