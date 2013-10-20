@@ -234,7 +234,7 @@ PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dimension, 
           append = TRUE, sep= ", ")
     write('', file= outfileName, append = TRUE)
     
-    outfileName = paste('output_run',i,'.txt', sep="")
+    outfileName = paste('starting_params.txt', sep="")
     }
 }
 
@@ -317,11 +317,11 @@ for( i in seq(from=1, to= trialCount, by=1)){
     PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, dimension, size, nei, p,
                     hubThreshold)
 #    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
-    rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
-                                     timeSteps)
+#    rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
+#                                     timeSteps)
  
-#    hubs_Model_run = Run_Hubs_Model(runCount, swpGraph, randGraph, hubThreshold, 
-#                           timeSteps)
+    hubs_Model_run = Run_Hubs_Model(runCount, swpGraph, randGraph, hubThreshold, 
+                           timeSteps)
 
 #    pathLength_Model_Run = Run_PathLength_Model(swpGraph, randGraph, hubMatrix)
 
