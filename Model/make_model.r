@@ -119,7 +119,7 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
 }
 
 # Run model that attacks the hubs first.
-Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold, 
+Run_Hubs_Model1 <- function(runCount, swpGraph, randGraph, hubThreshold, 
                            timeSteps){
   # Model Print Out 
   runLogOutput = paste('run',runCount,'_logOutput.txt', sep="")
@@ -338,7 +338,7 @@ for( i in seq(from=1, to= trialCount, by=1)){
 #    rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
 #                                     timeSteps)
  
-    hubs_Model_run = Run_Hubs_Model(runCount, swpGraph, randGraph, hubThreshold, 
+    hubs_Model_run1 = Run_Hubs_Model1(runCount, swpGraph, randGraph, hubThreshold, 
                            timeSteps)
 
 #    pathLength_Model_Run = Run_PathLength_Model(swpGraph, randGraph, hubMatrix)
