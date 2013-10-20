@@ -1,8 +1,11 @@
 ## Ryan Himmelwright
 ## Honors Thesis
 ## Make Model Script
-library(igraph)
 library(base)
+library(igraph)
+library(Matrix)
+library(methods)
+library(lattice)
 
 ################################################################################
 ############################## Defined Functions ###############################
@@ -116,7 +119,7 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
 }
 
 # Run model that attacks the hubs first.
-Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold, 
+Run_Hubs_Model1 <- function(runCount, swpGraph, randGraph, hubThreshold, 
                            timeSteps){
   # Model Print Out 
   runLogOutput = paste('run',runCount,'_logOutput.txt', sep="")
@@ -125,23 +128,38 @@ Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold,
 
  # Returns a list of the vertex number of all the hubs. 
   for(step in seq(from=1, to=timeSteps, by=1)){
-    hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
-    hubInd = (which(hubMatrix %in% 1))
-    nonHubs <- which(!(1:length(hubMatrix) %in% hubInd))
+    # Swp Hubs
+    swpHubMatrix  = FindHubs(runCount, hubThreshold, swpGraph)
+    swpHubInd     = (which(swpHubMatrix %in% 1))
+    swpNonHubs    <- which(!(1:length(swpHubMatrix) %in% swpHubInd))
+    # Rand Hubs
+    randHubMatrix = FindHubs(runCount, hubThreshold, randGraph)
+    randHubInd    = (which(randHubMatrix %in% 1))
+    randNonHubs   <- which(!(1:length(randHubMatrix) %in% randHubInd))
 
-    x <- sample(hubInd, 1)    # Random Hub Node
-    y <- sample(hubInd, 1)    # Random Hub Node
-    z <- sample(nonHubs, 1)   # Random Non-hub  
+    x  <- sample(swpHubInd, 1)    # Random swp Hub Node
+    xR <- sample(randHubInd, 1)   # random rand Hub node
+    y  <- sample(swpHubInd, 1)    # Random swp Hub Node
+    yR <- sample(randHubInd, 1)   # Random rand Hub node
+    z  <- sample(swpNonHubs, 1)   # Random Non-hub  
+    zR <- sample(randNonHubs, 1)   # Random rand Hub Node
     
-    swpGraph[x,y] <- FALSE    # Remove connection between hubs
-  
+    swpGraph[x,y]    <- FALSE     # Remove connection between swp hubs
+    randGraph[xR,yR] <- FALSE     # Remove connection between rand hubs     
+    
+    # Get a non-x-connected z value for swp graph
     while( swpGraph[x,z] == 1){
-      z <- sample(nonHubs, 1) # Random Non-hub  
+      z <- sample(swpNonHubs, 1) 
     } 
-    swpGraph[x,z] <- 1        # Add connection from hub to non hub
+    # Get a non-x-connected z value for rand graph
+    while( randGraph[xR,zR] == 1){
+      zR <- sample(randNonHubs, 1)
+    }
 
-    print(step)
+    swpGraph[x,z]    <- 1   # Add connection from hub to non hub in swp graph
+    randGraph[xR,zR] <- 1   # Add connection from hub to non hub in rand graph      
 
+    print(paste('step: ', step))
       
     # Print attributes to output file
     # -------------------------------
@@ -320,7 +338,7 @@ for( i in seq(from=1, to= trialCount, by=1)){
 #    rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
 #                                     timeSteps)
  
-    hubs_Model_run = Run_Hubs_Model(runCount, swpGraph, randGraph, hubThreshold, 
+    hubs_Model_run1 = Run_Hubs_Model1(runCount, swpGraph, randGraph, hubThreshold, 
                            timeSteps)
 
 #    pathLength_Model_Run = Run_PathLength_Model(swpGraph, randGraph, hubMatrix)
