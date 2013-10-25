@@ -13,7 +13,7 @@ library(lattice)
 # Function to Generate Small World Graph
 MakeSWPNetwork <- function(dimension,size,nei,p){
   swpGraph <- watts.strogatz.game(dimension,size,nei,p, loops = FALSE, multiple = FALSE)
-  return(swpGraph)
+return(swpGraph)
 }
 
 # Function to Generate an Erdos-Renyi random graph
@@ -71,36 +71,46 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
   runLogOutput = paste('run',runCount,'_logOutput.txt', sep="")
   write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Clustering'), 
         file= runLogOutput, append = TRUE, sep=",")
-  
+ print("in model Run now ") 
   # Loops the model for specified amount of time (timeSteps)
   for ( step in seq(from=1, to=timeSteps, by=1)){
-    x  <- sample(1:length(swpGraph), 1)  # X for swp Graph
-    xR <- sample(1:length(randGraph), 1) # X for rand graph
-    y  <- sample(1:length(swpGraph), 1)  # Y for swp graph
-    yR <- sample(1:length(randGraph), 1) # Y for rand graph
-    z  <- sample(1:length(swpGraph), 1)  # Z for swp graph
-    zR <- sample(1:length(randGraph), 1) # Z for rand graph
-    
+    x  <- sample(1:vcount(swpGraph), 1)  # X for swp Graph
+    xR <- sample(1:vcount(randGraph), 1) # X for rand graph
+    y  <- sample(1:vcount(swpGraph), 1)  # Y for swp graph
+    yR <- sample(1:vcount(randGraph), 1) # Y for rand graph
+    z  <- sample(1:vcount(swpGraph), 1)  # Z for swp graph
+    zR <- sample(1:vcount(randGraph), 1) # Z for rand graph
+
+print("s1")
     # Re-selects x and y if they don't have an edge between them.  
+      print(length(swpGraph))
+      
+      print(paste("x: ", x))
+      print(paste("y: ",y))
     while( swpGraph[x,y] == 0){
-      x<- sample(1:length(swpGraph), 1)
-      y<- sample(1:length(swpGraph), 1) 
+      x<- sample(1:vcount(swpGraph), 1)
+      print(paste("x: ", x))
+      y<- sample(1:vcount(swpGraph), 1)
+      print(paste("y: ",y))
     }
+print("s2")
     # Re-selects xR and yR if they don't have a connecting edge.
     while( randGraph[xR,yR] == 0){
-      xR <- sample(1:length(randGraph),1)
-      yR <- sample(1:length(randGraph),1)
+      xR <- sample(1:vcount(randGraph),1)
+      print(paste("xR: ", xR))
+      yR <- sample(1:vcount(randGraph),1)
+      print(paste("yR: ", yR))
     }
-
+print("s3")
     swpGraph[x,y]    <- FALSE              # Remove edge between x and y
     randGraph[xR,yR] <- FALSE              # Remove edge between xR and yR
 
     # Loops new z values until x and z don't have an edge
     while( swpGraph[x,z] == 1){
-      z<- sample(1:length(swpGraph), 1)
+      z<- sample(1:vcount(swpGraph), 1)
           }
     while( randGraph[xR,zR] == 1){
-      zR <- sample(1:length(randGraph), 1)
+      zR <- sample(1:vcount(randGraph), 1)
     }
     swpGraph[x,z] <- 1                  # Add edge between x and z
     randGraph[xR,zR] <- 1               # Add edge between xR and zR
@@ -221,16 +231,17 @@ for( i in seq(from=1, to= trialCount, by=1)){
     }
     }    
     
+    print("Start steps")
 
     # Run functions on Graphs
     # ------------------------
     hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
-   # CalcSws = CalcSws(swpGraph, randGraph)
     PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, dimension, size, nei, p,
                     hubThreshold)
 #    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
     rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
                                      timeSteps)
+
 
     # Increment for next run
     # ----------------------
