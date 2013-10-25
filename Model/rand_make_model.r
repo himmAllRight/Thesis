@@ -81,27 +81,16 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
     z  <- sample(1:vcount(swpGraph), 1)  # Z for swp graph
     zR <- sample(1:vcount(randGraph), 1) # Z for rand graph
 
-print("s1")
     # Re-selects x and y if they don't have an edge between them.  
-      print(length(swpGraph))
-      
-      print(paste("x: ", x))
-      print(paste("y: ",y))
     while( swpGraph[x,y] == 0){
       x<- sample(1:vcount(swpGraph), 1)
-      print(paste("x: ", x))
       y<- sample(1:vcount(swpGraph), 1)
-      print(paste("y: ",y))
     }
-print("s2")
     # Re-selects xR and yR if they don't have a connecting edge.
     while( randGraph[xR,yR] == 0){
       xR <- sample(1:vcount(randGraph),1)
-      print(paste("xR: ", xR))
       yR <- sample(1:vcount(randGraph),1)
-      print(paste("yR: ", yR))
     }
-print("s3")
     swpGraph[x,y]    <- FALSE              # Remove edge between x and y
     randGraph[xR,yR] <- FALSE              # Remove edge between xR and yR
 
