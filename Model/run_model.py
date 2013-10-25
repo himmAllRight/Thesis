@@ -3,7 +3,8 @@ import os
 import sys
 import datetime
 
-folderBase = sys.argv[1]
+modelNum   = int(sys.argv[1])
+folderBase = sys.argv[2]
 
 # Used to make time Stamped folder
 now       = datetime.datetime.now()
@@ -14,24 +15,44 @@ topFolder = folderBase + '_' + timeStamp
 makeTopFolder = 'mkdir ' + topFolder
 os.system(makeTopFolder)
 
+# Different types of the model
+modelType = ''
+if(modelNum == 1):
+  modelType = 'rand_make_model.r'
+if(modelNum == 2):
+  modelType = 'hubs1_make_model.r'
+if(modelNum == 3):
+  modelType = 'hubs2_make_model.r'
+if(modelNum == 4):
+  modelType = 'pathLength_make_model.r'
+
+# Parameter/ Parameter Arrays
+dimArray  = [2,3]                 # Dimension Values
+sizeArray = [23,8]                # Size Values
+neiArray  = [1]                   # Neighbor values
+pArray    = [.1,.15,.25,.35]      # re-wiring prob. values
+runs      = 30
+steps     = 1000
+
 runCount = 0
 # Loop through dimensions
-for dim in range(2,3):
-
-  # Loop through size
-  for size in range(30,31):
+for i in [0,1]:
+  dim  = dimArray[i]
+  size = sizeArray[i]
+#  # Loop through size
+#  for size in range(30,31,5):
 
     # Loop through nei
-    for nei in range(1,2):
-
-      # Loop through p
-      p = 0.00
-      for p_count in range(1,2):
-        p += 0.1
+  for nei in neiArray:
+    
+    p_count = 1
+    # Loop through p
+    for p in pArray:
+      p_count += 1
+             
+      # Run Model
+      folderName = folderBase + '_d' + str(dim) + '_s' + str(size) + '_n' + str(nei) + '_p' + str(p_count)
+      cmd = 'Rscript ' +  modelType + ' '+ topFolder + ' ' + folderName + ' ' + str(dim) + ' ' + str(size) + ' ' + str(nei) + ' ' + str(p) + ' ' + str(runs) + ' ' + str(steps)
+      os.system(cmd)
         
-        # Run Model
-        folderName = 'randModelRun' + '_d' + str(dim) + '_s' + str(size) + '_n' + str(nei) + '_p' + str(p_count)
-        cmd = 'Rscript make_model.r' + ' ' + ' '+ topFolder + ' ' + folderName + ' ' + str(dim) + ' ' + str(size) + ' ' + str(nei) + ' ' + str(p) +' 5 1000'
-        os.system(cmd)
-        
-        runCount += 1
+      runCount += 1
