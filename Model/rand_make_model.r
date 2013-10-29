@@ -230,8 +230,19 @@ for( i in seq(from=1, to= trialCount, by=1)){
 swpDeadNodes = (which(degree(swpGraph) < 1))
 randDeadNodes= (which(degree(randGraph) < 1))
 
-print(length(swpDeadNodes))
-print(length(randDeadNodes))
+swp2  <- delete.vertices(swpGraph, swpDeadNodes)
+rand2 <- delete.vertices(randGraph, randDeadNodes)
+
+deadNodeLengths  = c(length(swpDeadNodes), length(randDeadNodes))
+deadRemovalCount = deadNodeLengths[which.max(deadNodeLengths)]
+
+if( deadNodeLengths[1] - deadNodeLenghts[2] > 0 ){
+# remove abs() random nodes from rand
+}else if( deadNodeLengths[1] - deadNodeLengths[2] < 0){
+# remove abs() random nodes from swp
+}else{
+  # Both equal, do nothing?
+}
 
 
 
