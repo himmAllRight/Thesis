@@ -82,7 +82,7 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
     zR <- sample(1:vcount(randGraph), 1) # Z for rand graph
 
     # Re-selects x and y if they don't have an edge between them.  
-    while( swpGraph[x,y] == 0){
+    while( swpGraph[x,y] == 0 & degree(swpGraph)[y] > 1){
       x<- sample(1:vcount(swpGraph), 1)
       y<- sample(1:vcount(swpGraph), 1)
     }
@@ -207,11 +207,14 @@ for( i in seq(from=1, to= trialCount, by=1)){
   notSWP      = TRUE # true if the graphs are not swp
   notSWPCount = 0
   while(notSWP){
-    print("redo")
+    print("redo") # Re-generating Graph
     notSWPCount = notSWPCount + 1
-    print(notSWPCount)
+    print(notSWPCount) # Print re-gen number
+    
+    # Make New Graphs
     swpGraph = MakeSWPNetwork(dimension,size,nei,p)
     randGraph = MakeRandNetwork(dimension, size, nei, swpGraph)
+
     if(CalcSws(swpGraph, randGraph)$Sws > 1) notSWP=FALSE
     if(notSWPCount >= 1000){
 	  write(paste('Could not generate SWP graph in ', notSWPCount, 
@@ -222,14 +225,24 @@ for( i in seq(from=1, to= trialCount, by=1)){
     
     print("Start steps")
 
+
+# Removes unconnected nodes from generated graphs.
+swpDeadNodes = (which(degree(swpGraph) < 1))
+randDeadNodes= (which(degree(randGraph) < 1))
+
+print(length(swpDeadNodes))
+print(length(randDeadNodes))
+
+
+
     # Run functions on Graphs
     # ------------------------
     hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
     PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, dimension, size, nei, p,
                     hubThreshold)
 #    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
-    rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
-                                     timeSteps)
+#    rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
+#                                     timeSteps)
 
 
     # Increment for next run
