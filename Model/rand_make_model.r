@@ -122,12 +122,13 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
 ################################################################################
 ############################## Printing Functions ##############################
 ################################################################################
-PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dimension, size,
+PrintGraphStats <- function(runCount,swp1, rand1, swpGraph, randGraph, hubMatrix,dimension, size,
                             nei, p, hubThreshold){
   # Generate output file of each run in each run directory
   outfileName = "../cumulative_attributes.txt"   
     
   for (i in seq(from=1, to=2, by=1)){
+    write('-----', file= outfileName, append = TRUE)
     write(paste('runCount: ', runCount), file= outfileName, append = TRUE, sep= ", ")
     write(paste('dimension: ', dimension), file= outfileName, append = TRUE, sep= ", ")
     write(paste('Size: ',size), file= outfileName, append = TRUE, sep= ", ")
@@ -135,6 +136,20 @@ PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dimension, 
     write(paste('p: ',p), file= outfileName, append = TRUE, sep= ", ")
     write(paste('hubThreshold: ', hubThreshold), file= outfileName,
           append = TRUE, sep= ", ")
+
+    write('', file= outfileName, append = TRUE)
+    write(paste("Orig. Generated Graph:"), file= outfileName, append = TRUE, sep=", ")
+    write(paste('swpGraph Vertice count: ', vcount(swp1)), file= outfileName,
+          append = TRUE, sep= ", ")
+    write(paste('swpGraph Edge count: ',ecount(swp1)), file= outfileName, 
+          append = TRUE, sep= ", ")
+    write(paste('swpGraph Sws: ', CalcSws(swp1, rand1)$Sws), file= outfileName, append = TRUE, 
+          sep= ", ")
+    write(paste('swpGraph Hub count: ', sum(hubMatrix == 1)), file= outfileName,
+          append = TRUE, sep= ", ")
+    write('', file= outfileName, append = TRUE)
+
+    write(paste("After graph cleaning:"), file=outfileName, append = TRUE, sep=", ")
     write(paste('swpGraph Vertice count: ', vcount(swpGraph)), file= outfileName,
           append = TRUE, sep= ", ")
     write(paste('swpGraph Edge count: ',ecount(swpGraph)), file= outfileName, 
@@ -143,8 +158,8 @@ PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dimension, 
           sep= ", ")
     write(paste('swpGraph Hub count: ', sum(hubMatrix == 1)), file= outfileName,
           append = TRUE, sep= ", ")
+    write('-----', file= outfileName, append = TRUE)
     write('', file= outfileName, append = TRUE)
-    
     outfileName = paste('starting_params.txt', sep="")
     }
 }
@@ -226,30 +241,64 @@ for( i in seq(from=1, to= trialCount, by=1)){
     print("Start steps")
 
 
-# Removes unconnected nodes from generated graphs.
-swpDeadNodes = (which(degree(swpGraph) < 1))
-randDeadNodes= (which(degree(randGraph) < 1))
+  # Clean Graphs
+  # ------------
+  swpDeadNodes = (which(degree(swpGraph) < 1))
+  randDeadNodes= (which(degree(randGraph) < 1))
 
-swp2  <- delete.vertices(swpGraph, swpDeadNodes)
-rand2 <- delete.vertices(randGraph, randDeadNodes)
+  print(length(swpDeadNodes))
+  print(length(randDeadNodes))
+  # Copies saved for printing comparisons
+  swp1  <- swpGraph
+  rand1 <- randGraph
 
-deadNodeLengths  = c(length(swpDeadNodes), length(randDeadNodes))
-deadRemovalCount = deadNodeLengths[which.max(deadNodeLengths)]
+  # Removes unconnected nodes from generated graphs.
+  print("pre initial clean")
+  swpGraph  <- delete.vertices(swpGraph, swpDeadNodes)
+  randGraph <- delete.vertices(randGraph, randDeadNodes)
+  print("post initial clean")
 
-if( deadNodeLengths[1] - deadNodeLenghts[2] > 0 ){
-# remove abs() random nodes from rand
-}else if( deadNodeLengths[1] - deadNodeLengths[2] < 0){
-# remove abs() random nodes from swp
-}else{
-  # Both equal, do nothing?
-}
+  deadNodeLengths  = c(length(swpDeadNodes), length(randDeadNodes))
+  extraDead <- (deadNodeLengths[1] - deadNodeLengths[2])
+
+  if( extraDead > 0 ){
+    print("if 1")
+  # remove abs() random nodes from rand
+    startE <- ecount(randGraph)
+    randGraph <- delete.vertices(randGraph,sample(1:vcount(randGraph),
+                                 abs(extraDead)))
+    endE <- ecount(randGraph)
+
+    # Adds edges until the starting number is reached.
+    while( ecount(randGraph) < startE){
+      randGraph <- add.edges(randGraph, sample(1:vcount(randGraph),2),
+                             multiple = FALSE, loops = FALSE)
+    }
+
+  }else if( extraDead < 0){
+    print("if 2")
+    # remove abs() random nodes from swp
+    startE <- ecount(swpGraph)
+    swpGraph <- delete.vertices(swpGraph,sample(1:vcount(swpGraph),
+                                abs(extraDead)))
+    endE <- ecount(swpGraph)
+
+    # Adds edges until the starting number is reached.
+    while( ecount(swpGraph) < startE){
+      swpGraph <- add.edges(swpGraph, sample(1:vcount(swpGraph),2),
+                            multiple = FALSE, loops = FALSE )
+    }
+
+  }else{
+    # Both equal, do nothing?
+  }
 
 
 
     # Run functions on Graphs
     # ------------------------
     hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
-    PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, dimension, size, nei, p,
+    PrintGraphStats(runCount,swp1, rand1,  swpGraph, randGraph, hubMatrix, dimension, size, nei, p,
                     hubThreshold)
 #    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
 #    rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
