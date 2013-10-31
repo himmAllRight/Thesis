@@ -23,6 +23,66 @@ MakeRandNetwork <- function(dimension, size, nei, swpGraph){
   return(randGraph)
 }
 
+# Function to clean the graphs and remove the non connected nodes.
+CleanGraphs <- function(swpGraph, randGraph){
+  # Copies saved for printing comparisons  
+  swp1  <- swpGraph
+  rand1 <- randGraph
+
+  # Clean Graphs
+  # ------------
+  swpDeadNodes = (which(degree(swpGraph) < 1))
+  randDeadNodes= (which(degree(randGraph) < 1))
+
+  print(length(swpDeadNodes))
+  print(length(randDeadNodes))
+
+  # Removes unconnected nodes from generated graphs.
+  print("pre initial clean")
+  swpGraph  <- delete.vertices(swpGraph, swpDeadNodes)
+  randGraph <- delete.vertices(randGraph, randDeadNodes)
+  print("post initial clean")
+
+  deadNodeLengths  = c(length(swpDeadNodes), length(randDeadNodes))
+  extraDead <- (deadNodeLengths[1] - deadNodeLengths[2])
+
+  if( extraDead > 0 ){
+    print("if 1")
+  # remove abs() random nodes from rand
+    startE <- ecount(randGraph)
+    randGraph <- delete.vertices(randGraph,sample(1:vcount(randGraph),
+                                 abs(extraDead)))
+    endE <- ecount(randGraph)
+
+    # Adds edges until the starting number is reached.
+    while( ecount(randGraph) < startE){
+      randGraph <- add.edges(randGraph, sample(1:vcount(randGraph),2),
+                             multiple = FALSE, loops = FALSE)
+    }
+
+  } else if( extraDead < 0){
+    print("if 2")
+    # remove abs() random nodes from swp
+    startE <- ecount(swpGraph)
+    swpGraph <- delete.vertices(swpGraph,sample(1:vcount(swpGraph),
+                                abs(extraDead)))
+    endE <- ecount(swpGraph)
+
+    # Adds edges until the starting number is reached.
+    while( ecount(swpGraph) < startE){
+      swpGraph <- add.edges(swpGraph, sample(1:vcount(swpGraph),2),
+                            multiple = FALSE, loops = FALSE )
+      }
+    }
+
+  # Array to return with all the pre and post cleaned graphs.
+  graphList <- list("swp1" = swp1, "rand1" = rand1, "swpGraph" = swpGraph, 
+                    "randGraph" = randGraph)
+
+  return(graphList)
+  
+}
+
 # Finds the hubs of a network.
 FindHubs <- function(runCount, hubThreshold, swpGraph){
   hubScore  = hub.score(swpGraph) 
@@ -258,70 +318,26 @@ for( i in seq(from=1, to= trialCount, by=1)){
     
     print("Start steps")
 
-
   # Clean Graphs
-  # ------------
-  swpDeadNodes = (which(degree(swpGraph) < 1))
-  randDeadNodes= (which(degree(randGraph) < 1))
+  graphList <- CleanGraphs(swpGraph, randGraph)
+  swp1        <- graphList$swp1      # Origonal swp for comparison
+  rand1       <- graphList$rand1     # Origonal rand for comparison
+  swpGraph    <- graphList$swpGraph  # Cleaned swp Graph
+  randGraph   <- graphList$randGraph # Cleaned rand Graph
 
-  print(length(swpDeadNodes))
-  print(length(randDeadNodes))
-  # Copies saved for printing comparisons
-  swp1  <- swpGraph
-  rand1 <- randGraph
-
-  # Removes unconnected nodes from generated graphs.
-  print("pre initial clean")
-  swpGraph  <- delete.vertices(swpGraph, swpDeadNodes)
-  randGraph <- delete.vertices(randGraph, randDeadNodes)
-  print("post initial clean")
-
-  deadNodeLengths  = c(length(swpDeadNodes), length(randDeadNodes))
-  extraDead <- (deadNodeLengths[1] - deadNodeLengths[2])
-
-  if( extraDead > 0 ){
-    print("if 1")
-  # remove abs() random nodes from rand
-    startE <- ecount(randGraph)
-    randGraph <- delete.vertices(randGraph,sample(1:vcount(randGraph),
-                                 abs(extraDead)))
-    endE <- ecount(randGraph)
-
-    # Adds edges until the starting number is reached.
-    while( ecount(randGraph) < startE){
-      randGraph <- add.edges(randGraph, sample(1:vcount(randGraph),2),
-                             multiple = FALSE, loops = FALSE)
-    }
-
-  }else if( extraDead < 0){
-    print("if 2")
-    # remove abs() random nodes from swp
-    startE <- ecount(swpGraph)
-    swpGraph <- delete.vertices(swpGraph,sample(1:vcount(swpGraph),
-                                abs(extraDead)))
-    endE <- ecount(swpGraph)
-
-    # Adds edges until the starting number is reached.
-    while( ecount(swpGraph) < startE){
-      swpGraph <- add.edges(swpGraph, sample(1:vcount(swpGraph),2),
-                            multiple = FALSE, loops = FALSE )
-    }
-}
-
-
-    # Run functions on Graphs
-    # ------------------------
-    hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
-    PrintGraphStats(runCount,swp1, rand1,  swpGraph, randGraph, hubMatrix, dimension, size, nei, p,
-                    hubThreshold)
-#    plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
-    rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
+  # Run functions on Graphs
+  # ------------------------
+  hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
+  PrintGraphStats(runCount,swp1, rand1,  swpGraph, randGraph, hubMatrix, dimension, size, nei, p,
+                  hubThreshold)
+#  plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
+   rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
                                      timeSteps)
 
 
-    # Increment for next run
-    # ----------------------
-    runCount = runCount + 1
-    setwd("..") # Go up a directory
+  # Increment for next run
+  # ----------------------
+  runCount = runCount + 1
+  setwd("..") # Go up a directory
 }
 print(warnings())
