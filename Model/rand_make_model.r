@@ -77,21 +77,37 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
     x  <- sample(1:vcount(swpGraph), 1)  # X for swp Graph
     xR <- sample(1:vcount(randGraph), 1) # X for rand graph
 
+print(x)
+print(xR)
+
     # makes list of all connected nodes to x and xR
     xNeighbors  <- unlist(get.adjlist(swpGraph)[x])
     xRNeighbors <- unlist(get.adjlist(randGraph)[xR])
+
+print(xNeighbors)
+print(xRNeighbors)
 
     # Selects a y from x and xR adj.
     y  <- sample(xNeighbors, 1)  # Y for swp graph
     yR <- sample(xRNeighbors, 1) # Y for rand graph
 
+print(y)
+print(yR)
+
     # Re-selects y if they don't other edges.  
-    while( degree(swpGraph)[y] > 1){
+    while( degree(swpGraph)[y] < 2){
       y<- sample(xNeighbors, 1)
+print('y Still?')
+print(y)
+print(degree(swpGraph)[y])
+
     }
     # Re-selects yR if they don't other edges.
-    while( degree(randGraph)[y] > 1 ){
+    while( degree(randGraph)[yR] < 2 ){
       yR <- sample(xRNeighbors,1)
+print('yR')
+print(yR)
+print(degree(randGraph)[yR])
     }
 
     swpGraph[x,y]    <- FALSE              # Remove edge between x and y
@@ -100,6 +116,9 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
     # Selects new z values that don't have an edge with x.
     z  <- sample(which(!(1:vcount(swpGraph) %in% xNeighbors)), 1)
     zR <- sample(which(!(1:vcount(randGraph) %in% xRNeighbors)), 1)
+
+print(z)
+print(zR)
 
     swpGraph[x,z] <- 1                  # Add edge between x and z
     randGraph[xR,zR] <- 1               # Add edge between xR and zR
