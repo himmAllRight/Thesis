@@ -23,6 +23,66 @@ MakeRandNetwork <- function(dimension, size, nei, swpGraph){
   return(randGraph)
 }
 
+# Function to clean the graphs and remove the non connected nodes.
+CleanGraphs <- function(swpGraph, randGraph){
+  # Copies saved for printing comparisons  
+  swp1  <- swpGraph
+  rand1 <- randGraph
+
+  # Clean Graphs
+  # ------------
+  swpDeadNodes = (which(degree(swpGraph) < 1))
+  randDeadNodes= (which(degree(randGraph) < 1))
+
+  print(length(swpDeadNodes))
+  print(length(randDeadNodes))
+
+  # Removes unconnected nodes from generated graphs.
+  print("pre initial clean")
+  swpGraph  <- delete.vertices(swpGraph, swpDeadNodes)
+  randGraph <- delete.vertices(randGraph, randDeadNodes)
+  print("post initial clean")
+
+  deadNodeLengths  = c(length(swpDeadNodes), length(randDeadNodes))
+  extraDead <- (deadNodeLengths[1] - deadNodeLengths[2])
+
+  if( extraDead > 0 ){
+    print("if 1")
+  # remove abs() random nodes from rand
+    startE <- ecount(randGraph)
+    randGraph <- delete.vertices(randGraph,sample(1:vcount(randGraph),
+                                 abs(extraDead)))
+    endE <- ecount(randGraph)
+
+    # Adds edges until the starting number is reached.
+    while( ecount(randGraph) < startE){
+      randGraph <- add.edges(randGraph, sample(1:vcount(randGraph),2),
+                             multiple = FALSE, loops = FALSE)
+    }
+
+  } else if( extraDead < 0){
+    print("if 2")
+    # remove abs() random nodes from swp
+    startE <- ecount(swpGraph)
+    swpGraph <- delete.vertices(swpGraph,sample(1:vcount(swpGraph),
+                                abs(extraDead)))
+    endE <- ecount(swpGraph)
+
+    # Adds edges until the starting number is reached.
+    while( ecount(swpGraph) < startE){
+      swpGraph <- add.edges(swpGraph, sample(1:vcount(swpGraph),2),
+                            multiple = FALSE, loops = FALSE )
+      }
+    }
+
+  # Array to return with all the pre and post cleaned graphs.
+  graphList <- list("swp1" = swp1, "rand1" = rand1, "swpGraph" = swpGraph, 
+                    "randGraph" = randGraph)
+
+  return(graphList)
+  
+}
+
 # Finds the hubs of a network.
 FindHubs <- function(runCount, hubThreshold, swpGraph){
   hubScore  = hub.score(swpGraph) 
@@ -96,10 +156,12 @@ Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold,
     
     # Get a non-x-connected z value for swp graph
     while( swpGraph[x,z] == 1){
+print(paste("z: ", z))
       z <- sample(swpNonHubs, 1) 
     } 
     # Get a non-x-connected z value for rand graph
     while( randGraph[xR,zR] == 1){
+print(paste("zR: ", zR))
       zR <- sample(randNonHubs, 1)
     }
 
@@ -213,12 +275,20 @@ for( i in seq(from=1, to= trialCount, by=1)){
     randGraph = MakeRandNetwork(dimension, size, nei, swpGraph)
     if(CalcSws(swpGraph, randGraph)$Sws > 1) notSWP=FALSE
     if(notSWPCount >= 1000){
-	  write(paste('Could not generate SWP graph in ', notSWPCount, 
+	    write(paste('Could not generate SWP graph in ', notSWPCount, 
 	  	            ' tries.'), file= 'failed.txt', append = TRUE, sep= ", ")
-	  quit(save = "no")
-    }
+	    quit(save = "no")
+      }
     }    
     
+  # Clean Graphs
+  graphList <- CleanGraphs(swpGraph, randGraph)
+  swp1        <- graphList$swp1      # Origonal swp for comparison
+  rand1       <- graphList$rand1     # Origonal rand for comparison
+  swpGraph    <- graphList$swpGraph  # Cleaned swp Graph
+  randGraph   <- graphList$randGraph # Cleaned rand Graph
+
+
 
     # Run functions on Graphs
     # ------------------------
