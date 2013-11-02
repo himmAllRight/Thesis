@@ -121,6 +121,21 @@ CalcSws <- function(swpGraph, randGraph){
   return(swsList)
 }
 
+# Returns two lists containing all the hub-hub connections.
+HubHub <- function(swpGraph, hubs){
+  hubhub1 <- c()
+  hubhub2 <- c()
+
+  for(hubi in hubs){
+    for(neighbori in intersect(unlist(get.adjlist(swpGraph)[hubi]), hubs)){
+      hubhub1 <- c(hubhub1, hubi)
+      hubhub2 <- c(hubhub2, neighbori)
+    }
+  }
+  hubhub <- c(hubhub1, hubhub2)
+  return(hubhub)
+}
+
 ################################################################################
 ##############################  Models Functions  ##############################
 ################################################################################
@@ -143,30 +158,90 @@ Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold,
     randHubMatrix = FindHubs(runCount, hubThreshold, randGraph)
     randHubInd    = (which(randHubMatrix %in% 1))
     randNonHubs   <- which(!(1:length(randHubMatrix) %in% randHubInd))
+    
+    # SWP hub-hub connections
+    hubhub  <- HubHub(swpGraph, swpHubInd)
+    hubhub1 <- hubhub[1]  # used for x
+    hubhub2 <- hubhub[2]  # used for y
+   
+    # SWP hub-hub connections
+    randHubHub  <- HubHub(randGraph, randHubInd)
+    randHubHub1 <- HubHub(randGraph, randHubInd)
+    randHubHub2 <- HubHub(randGraph, randHubInd)
 
-    x  <- sample(swpHubInd, 1)    # Random swp Hub Node
-    xR <- sample(randHubInd, 1)   # random rand Hub node
-    y  <- sample(swpHubInd, 1)    # Random swp Hub Node
-    yR <- sample(randHubInd, 1)   # Random rand Hub node
-    z  <- sample(swpNonHubs, 1)   # Random Non-hub  
-    zR <- sample(randNonHubs, 1)   # Random rand Hub Node
+    # SWP Alg: If there are no Hubs
+    if(length(swpHubInd) < 1){
+     print("swp if 1")
+      #terminate 
+
+    }else{
+      # If there are hub-hub connections
+      if(length(hubhub1) >= 2){
+
+print("swp else if")
+        # Takes a sample x from the list of connected hubs.
+        xInd <- sample(1:length(hubhub1), 1) # Ind of a hub-hub connection
+        x    <- hubhub1[xInd]                # node x for that connection
+        y    <- hubhub2[xInd]                # node y for that connection
+ 
+        swpGraph[x,y]    <- FALSE   # Removes edge between x and y
     
-    swpGraph[x,y]    <- FALSE     # Remove connection between swp hubs
-    randGraph[xR,yR] <- FALSE     # Remove connection between rand hubs     
+        nonAdjZ <- which(!(1:vcount(swpGraph) %in% unlist(get.adjlist(swpGraph)[x])))
+        z  <- sample( intersect(swpNonHubs,nonAdjZ) , 1 ) 
+        swpGraph[x,z] <- 1             # Adds edge between x and z
     
-    # Get a non-x-connected z value for swp graph
-    while( swpGraph[x,z] == 1){
-print(paste("z: ", z))
-      z <- sample(swpNonHubs, 1) 
-    } 
-    # Get a non-x-connected z value for rand graph
-    while( randGraph[xR,zR] == 1){
-print(paste("zR: ", zR))
-      zR <- sample(randNonHubs, 1)
+      }
+      # If there are hubs, but no hub-hub connections
+      else if( length(hubhub1) < 2 ){
+
+print("swp else else if")
+
+        x <- sample(swpHubInd, 1)   # Random hub node
+        y <- sample(unlist(get.adjlist(swpGraph)[x]) , 1) # Random x-adj, non-hub    
+        swpGraph[x,y] <- FALSE #Removes edge between x and y
+        nonAdjZ <- which(!(1:vcount(swpGraph) %in% unlist(get.adjlist(swpGraph)[x])))
+        z  <- sample( intersect(swpNonHubs,nonAdjZ) , 1 ) 
+        swpGraph[x,z] <- 1            # Adds edge between x and z
+      }
+}
+    
+
+
+    # Rand: If there are no Hubs
+    if(length(randHubInd) < 1){
+print("rand if")
+      #terminate 
+
+    }else{
+      # If there are hub-hub connections
+      if(length(randHubHub1) >= 2){
+print("rand else if")
+        # Takes a sample x from the list of connected hubs.
+        xRInd <- sample(1:length(randHubHub1), 1) # Ind of a hub-hub connection
+        xR    <- randHubHub1[xRInd]                # node x for that connection
+        yR    <- randHubHub2[xRInd]                # node y for that connection
+
+        randGraph[xR,yR]    <- FALSE   # Removes edge between x and y
+
+        nonAdjZR <- which(!(1:vcount(swpGraph) %in% unlist(get.adjlist(swpGraph)[x])))
+        zR  <- sample( intersect(swpNonHubs,nonAdjZ) , 1 ) 
+        randGraph[xR,zR] <- 1             # Adds edge between x and z
+
+      }
+      # If there are hubs, but no hub-hub connections
+      else if( length(randHubHub1) < 2 ){
+print("rand else else if")
+        xR <- sample(randHubInd, 1)   # Random hub node
+        yR <- sample(unlist(get.adjlist(randGraph)[xR]) , 1) # Random x-adj, non-hub
+
+        randGraph[xR,yR] <- FALSE #Removes edge between x and y
+
+        nonAdjZR <- which(!(1:vcount(swpGraph) %in% unlist(get.adjlist(swpGraph)[x])))
+        zR  <- sample( intersect(swpNonHubs,nonAdjZ) , 1 ) 
+        randGraph[xR,zR] <- 1            # Adds edge between x and z
+      }
     }
 
-    swpGraph[x,z]    <- 1   # Add connection from hub to non hub in swp graph
-    randGraph[xR,zR] <- 1   # Add connection from hub to non hub in rand graph      
 
     print(paste('step: ', step))
       
@@ -179,7 +254,6 @@ print(paste("zR: ", zR))
           swsList$swpClustering), file= runLogOutput, append = TRUE, sep="," )
     }
 }
-
 ################################################################################
 ############################## Printing Functions ##############################
 ################################################################################
