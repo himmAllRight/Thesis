@@ -254,8 +254,7 @@ PlotGraph <- function(runCount,tag, swpGraph, randGraph, hubMatrix){
   }
   # SWP Plot
   png(file=(paste("SWPplot",runCount,tag,".png",sep="")))
-  plot(swpGraph, vertex.size=3, vertex.label=NA, edge.arrow.size=0,
-       layout=layout.fruchterman.reingold(g, niter=10000))
+  plot(swpGraph, vertex.size=3, vertex.label=NA, edge.arrow.size=0)
   dev.off()
   # Rand Plot
   png(file="rand_plot1.png")
