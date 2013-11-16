@@ -242,7 +242,7 @@ PrintGraphStats <- function(runCount,swp1, rand1, swpGraph, randGraph, hubMatrix
     }
 }
 
-PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
+PlotGraph <- function(runCount,tag, swpGraph, randGraph, hubMatrix){
   # Color hubs in SWP plot.
   for (i in seq(from=1, to= length(hubMatrix), by=1)){
     if(hubMatrix[i] == 1){
@@ -252,11 +252,15 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
         V(swpGraph)$color[i] = "cyan"
       }
   }
-  ## Plot
-  png(file=(paste("SWPplot",runCount,".png",sep="")))
-  plot(swpGraph)
+  # SWP Plot
+  png(file=(paste("SWPplot",runCount,tag,".png",sep="")))
+  plot(swpGraph, vertex.size=3, vertex.label=NA, edge.arrow.size=0,
+       layout=layout.fruchterman.reingold(g, niter=10000))
+  dev.off()
+  # Rand Plot
   png(file="rand_plot1.png")
-  plot(randGraph)
+  plot(randGraph, vertex.size=3, vertex.label=NA, edge.arrow.size=0)
+  dev.off()
 }
 
 ################################################################################
@@ -330,9 +334,15 @@ for( i in seq(from=1, to= trialCount, by=1)){
   hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
   PrintGraphStats(runCount,swp1, rand1,  swpGraph, randGraph, hubMatrix, dimension, size, nei, p,
                   hubThreshold)
-#  plotGraph = PlotGraph(runCount, swpGraph, randGraph, hubMatrix)
-   rand_Model_Run = Run_Random_Model(runCount,swpGraph, randGraph, hubMatrix,
+  
+  # Plot Graphs Before Model Runs
+  plotGraph = PlotGraph(runCount, "pre", swpGraph, randGraph, hubMatrix)
+
+  # Run Model  
+  rand_Model_Run = Run_Random_Model(runCount, swpGraph, randGraph, hubMatrix,
                                      timeSteps)
+  # Plot Graphs After Model Runs
+  plotGraph = PlotGraph(runCount, "post", swpGraph, randGraph, hubMatrix)
 
 
   # Increment for next run

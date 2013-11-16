@@ -1,4 +1,0 @@
-#!/bin/bash
-
-# Pulls the Thesis Directory from the AEC Computers
-rsync -avzu --delete --progress himmelwr@compute217.cs.lafayette.edu:~/Documents/Thesis/ ~/Documents/Thesis/
