@@ -1,8 +1,0 @@
-Ideas for proposal - Invert layout of proposal
-
-structural/functional connectivity -> meaning (sleep) why it matters -> how are the maps made -> how they are important -> then the network stuff
-
-model
-
-  - implement SD
-  - also move edges in random graph

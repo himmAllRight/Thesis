@@ -1,6 +1,0 @@
--Drive with something other than SWP, use SWP as a measure 
-
-3 Algorithms:
-	- Random      -> spit out measures, just random
-	- Hubs        -> move hub connectors, spit out measures
-	- Path Length -> move to increasing path length, drive, spit out measures

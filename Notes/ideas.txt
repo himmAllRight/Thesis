@@ -1,8 +1,0 @@
-Looking back at the Strogatz paper, I realize that they used a fixed average degree (k), for their model. Since the SWP network is generated from a random network, a degree is selected for the average degree of each node. Thus, when generating my network, I have to find a good degree to use, possibly based off of previous research.
-	- (In the paper they use an n=20 and k=4 for the figures, but indicate that a much larger n and k are used through the rest of the paper
-
-What I need to do in the model:
-	- Generate any old SWP graph using the strogatz function.
-	- With a practice graph, I need to lookup and figure out how to implement a way to detect the hubs of the graph.
-	- I also have to look up the various ways to measure SWP, and try to use them based on how close they are to the biology.
-	- With this setup, I can start running tests across various parameters to find a good parameter space to do my experiments in.)
