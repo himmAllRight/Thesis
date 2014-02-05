@@ -7,10 +7,6 @@ library(Matrix)
 library(methods)
 library(lattice)
 
-# Generate Random Seed Value
-seedValue <- sample(1:50000,1)
-set.seed(seedValue)
-
 ################################################################################
 ############################## Defined Functions ###############################
 ################################################################################
@@ -23,26 +19,23 @@ MakeSWPNetwork <- function(dimension,size,nei,p){
 # Function to Generate an Erdos-Renyi random graph
 MakeRandNetwork <- function(dimension, size, nei, swpGraph){
   # Try to make a random graph with the watts.strogatz.game function
-  #randGraph <- watts.strogatz.game(dimension,size,nei,1,loops = FALSE, multiple = FALSE)
-  randGraph <- erdos.renyi.game(vcount(swpGraph),ecount(swpGraph), type="gnm",
-                               directed = FALSE, loops = FALSE)
+  randGraph <- watts.strogatz.game(dimension,size,nei,1,loops = FALSE, multiple = FALSE)
   return(randGraph)
 }
 
-
 # Finds the hubs of a network.
 FindHubs <- function(runCount, hubThreshold, swpGraph){
-  hubScore  <- hub.score(swpGraph) 
-  hubValues <- hubScore$vector      # Takes just values from hub score
+  hubScore  = hub.score(swpGraph) 
+  hubValues = hubScore$vector      # Takes just values from hub score
   # Replaces all hubs with a 1, and other vertices with a 0.
-  hubMatrix <- replace(replace(hubValues,hubValues >= hubThreshold, 1),
+  hubMatrix = replace(replace(hubValues,hubValues >= hubThreshold, 1),
                               hubValues < hubThreshold,0)  
   return(hubMatrix)
 }
 
 # Returns the number of hubs in the Matrix
 HubCounts <- function(hubMatrix){
-  count <- sum(hubMatrix == 1)
+  count = sum(hubMatrix == 1)
   return(count)
 }
 
@@ -50,54 +43,22 @@ HubCounts <- function(hubMatrix){
 # Calculates S^WS for the network.
 CalcSws <- function(swpGraph, randGraph){
   # Calculates clustering coefficients of swp and rand graphs
-  # old
-  swpGamma  <-  transitivity(swpGraph, type="global", vids=NULL, weights=NULL,
-                            isolates="Nan")
-  # New Clustering Coefficient Calc
-  swpCC     <- transitivity(swpGraph, type='localaverageundirecte', vids=NULL,
-                            weights=NULL, isolates="NaN")
-  
-  # old								
-  randGamma <- transitivity(randGraph, type="global", vids=NULL, weights=NULL,
-                            isolates="Nan")                         
-
-  # New Clustering Coefficient Calc
-  randCC    <- transitivity(randGraph, type='localaverageundirected', vids=NULL,
-                            weights=NULL, isolates="NaN")
-
-  gamma     <- (swpGamma/randGamma) # combines them to get the Gamma value.
-  gamma2    <- (swpCC/randCC) # Gamma w/ new CC calcs
+  swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL,
+                            isolates="zero")								
+  randGamma = transitivity(randGraph, type="global", vids=NULL, weights=NULL,
+                           isolates="zero")                         
+  gamma = (swpGamma/randGamma) # combines them to get the Gamma value.
 
   # Calculates the mean minmal path length for swp and corresponding rand graphs
-  swpLambda <- average.path.length(swpGraph)
-  randLambda <- average.path.length(randGraph)
-  lambda <- (swpLambda / randLambda)  # Combines to get the ratio Lambda value
+  swpLambda = average.path.length(swpGraph)
+  randLambda = average.path.length(randGraph)
+  lambda = (swpLambda / randLambda)  # Combines to get the ratio Lambda value
 
-  Sws       <- (gamma/lambda) # Calculates S^WS from the ratio.
-  Sws2      <- (gamma2/lambda) # Sws with new CC calculation
+  Sws = (gamma/lambda) # Calculates S^WS from the ratio.
   
   swsList <- list("Sws" = Sws, "swpPathLength" = swpLambda, 
-                  "swpClustering" = swpGamma, "swpCC" = swpCC, "Sws2"=Sws2)
+                  "swpClustering" = swpGamma)
   return(swsList)
-}
-
-# Returns two lists containing all the hub-hub connections.
-HubHub <- function(swpGraph, hubs){
-  hubhub1 <- c()
-  hubhub2 <- c()
-
-  for(hubN in hubs){
-    adjHubs <- intersect(unlist(get.adjlist(swpGraph)[hubN]), hubs)
-    if(length(adjHubs) > 0){
-      for( m in seq(from=1, to=length(adjHubs), by=1)){
-        hubhub1 <- c(hubhub1, hubN)
-        hubhub2 <- c(hubhub2, adjHubs[m])
-      }
-    }
-  }
-
-  hubhub <- list("hubhub1" = hubhub1, "hubhub2"=hubhub2)
-  return(hubhub)
 }
 
 ################################################################################
@@ -109,78 +70,34 @@ Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold,
                            timeSteps){
   # Model Print Out 
   runLogOutput = paste('run',runCount,'_logOutput.txt', sep="")
-  write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Transitivity \t Clustering \t Sws2 '), 
+  write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Clustering'), 
         file= runLogOutput, append = TRUE, sep=",")
 
  # Returns a list of the vertex number of all the hubs. 
   for(step in seq(from=1, to=timeSteps, by=1)){
     # Swp Hubs
-    swpHubMatrix  <- FindHubs(runCount, hubThreshold, swpGraph)
-    swpHubInd     <- (which(swpHubMatrix %in% 1))
+    swpHubMatrix  = FindHubs(runCount, hubThreshold, swpGraph)
+    swpHubInd     = (which(swpHubMatrix %in% 1))
     swpNonHubs    <- which(!(1:length(swpHubMatrix) %in% swpHubInd))
+    # Rand Hubs
+    randHubMatrix = FindHubs(runCount, hubThreshold, randGraph)
+    randHubInd    = (which(randHubMatrix %in% 1))
+    randNonHubs   <- which(!(1:length(randHubMatrix) %in% randHubInd))
 
-print(vcount(swpGraph))
-print(ecount(swpGraph))
-    
-    # SWP hub-hub connections
-    hubhub  <- HubHub(swpGraph, swpHubInd)
-    hubhub1 <- hubhub$hubhub1  # used for x
-    hubhub2 <- hubhub$hubhub2  # used for y
-   
-print(paste('step: ', step))
-    if(length(swpHubInd) < 1){
-      print("terminate")
-      #terminate 
+     
 
-    }else{
-      # If there are hub-hub connections
-      if(length(hubhub1) >= 2){
-        # Takes a sample x from the list of connected hubs.
-        xInd <- sample(1:length(hubhub1), 1) # Ind of a hub-hub connection
-        x    <- hubhub1[xInd]                # node x for that connection
-        y    <- hubhub2[xInd]                # node y for that connection
- 
-        swpGraph[x,y]    <- FALSE   # Removes edge between x and y
-        nonAdjZ <- which(!(1:vcount(swpGraph) %in% unlist(get.adjlist(swpGraph)[x])))
-        z  <- sample( intersect(swpNonHubs,nonAdjZ) , 1 ) 
-        swpGraph[x,z] <- 1             # Adds edge between x and z
-    
-      }
-      # If there are hubs, but no hub-hub connections
-      else if( length(hubhub1) < 2 ){
-        # If there is only 1 hub.
-        if( length(swpHubInd) == 1){
-          print("hub1")
-          x <- swpHubInd[1]       # Select the hub
-          y <- sample(unlist(get.adjlist(swpGraph)[x]), 1) # Random x-adj
-          swpGraph[x,y] <- FALSE  # Removes edge between x and y
-          nonAdjZ <- which(!(1:vcount(swpGraph) %in% unlist(get.adjlist(swpGraph)[x])))
-          z <- sample( intersect(swpNonHubs,nonAdjZ), 1)
-          swpGraph[x,z] <-1
-        }else{ # If there is more than 1 hub
-          x <- sample(swpHubInd, 1)   # Random hub node
-          y <- sample(unlist(get.adjlist(swpGraph)[x]) , 1) # Random x-adj, non-hub    
-          
-          swpGraph[x,y] <- FALSE #Removes edge between x and y
-          nonAdjZ <- which(!(1:vcount(swpGraph) %in% unlist(get.adjlist(swpGraph)[x])))
-          z  <- sample( intersect(swpNonHubs,nonAdjZ) , 1 ) 
-          swpGraph[x,z] <- 1            # Adds edge between x and z
-        }
-      }
-    }
-    
-
-
+    print(paste('step: ', step))
+      
     # Print attributes to output file
     # -------------------------------
-    swsList <- CalcSws(swpGraph,randGraph)
-    swpGamma  <-  transitivity(swpGraph, type="global", vids=NULL, weights=NULL)
+    swsList = CalcSws(swpGraph,randGraph)
+    swpGamma  =  transitivity(swpGraph, type="global", vids=NULL, weights=NULL)
     write(paste(step,'\t',HubCounts(FindHubs(runCount, hubThreshold, swpGraph)),
           '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
-          swsList$swpClustering,'\t', swsList$swpCC, '\t', swsList$Sws2 ),
-          file= runLogOutput, append = TRUE, sep="," )
+          swsList$swpClustering), file= runLogOutput, append = TRUE, sep="," )
     }
 }
+
 ################################################################################
 ############################## Printing Functions ##############################
 ################################################################################
@@ -191,7 +108,6 @@ PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dimension, 
     
   for (i in seq(from=1, to=2, by=1)){
     write(paste('runCount: ', runCount), file= outfileName, append = TRUE, sep= ", ")
-    write(paste('seedVale: ', seedValue), file= outfileName, append = TRUE, sep=",")
     write(paste('dimension: ', dimension), file= outfileName, append = TRUE, sep= ", ")
     write(paste('Size: ',size), file= outfileName, append = TRUE, sep= ", ")
     write(paste('Nei: ', nei), file= outfileName, append = TRUE, sep= ", ")
@@ -208,7 +124,7 @@ PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dimension, 
           append = TRUE, sep= ", ")
     write('', file= outfileName, append = TRUE)
     
-    outfileName <- paste('starting_params.txt', sep="")
+    outfileName = paste('starting_params.txt', sep="")
     }
 }
 
@@ -239,17 +155,18 @@ dimension <- as.numeric(args[3])
 size      <- as.numeric(args[4])
 nei  	  <- as.numeric(args[5])
 p    	  <- as.numeric(args[6])
-hubThreshold <- as.numeric(args[7]) # The threshold of the centrality score for determing a hub
 
 # Number of runs
-trialCount <- as.numeric(args[8])
-timeSteps  <- as.numeric(args[9])
+trialCount= as.numeric(args[7])
+timeSteps = as.numeric(args[8])
 
 setwd(topFolder)
 
 
+hubThreshold  = 0.8 # The threshold of the centrality score for determing a hub
+
 # Generate Directories for all trials
-runCount <- 1
+runCount =1
 
 for( i in seq(from=1, to= trialCount, by=1)){
 
@@ -266,35 +183,36 @@ for( i in seq(from=1, to= trialCount, by=1)){
 
   # Generate Graphs
   # ----------------
-  notSWP      <- TRUE # true if the graphs are not swp
-  notSWPCount <- 0
+  notSWP      = TRUE # true if the graphs are not swp
+  notSWPCount = 0
   while(notSWP){
     print("redo")
-    notSWPCount <- notSWPCount + 1
+    notSWPCount = notSWPCount + 1
     print(notSWPCount)
-    swpGraph <- MakeSWPNetwork(dimension,size,nei,p)
-    randGraph <- MakeRandNetwork(dimension, size, nei, swpGraph)
-    if(CalcSws(swpGraph, randGraph)$Sws > 1) notSWP <- FALSE
+    swpGraph = MakeSWPNetwork(dimension,size,nei,p)
+    randGraph = MakeRandNetwork(dimension, size, nei, swpGraph)
+    if(CalcSws(swpGraph, randGraph)$Sws > 1) notSWP=FALSE
     if(notSWPCount >= 1000){
-	    write(paste('Could not generate SWP graph in ', notSWPCount, 
+	  write(paste('Could not generate SWP graph in ', notSWPCount, 
 	  	            ' tries.'), file= 'failed.txt', append = TRUE, sep= ", ")
-	    quit(save = "no")
-      }
+	  quit(save = "no")
+    }
     }    
     
+
     # Run functions on Graphs
     # ------------------------
-    hubMatrix <- FindHubs(runCount, hubThreshold, swpGraph)
+    hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
    # CalcSws = CalcSws(swpGraph, randGraph)
     PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, dimension, size, nei, p,
                     hubThreshold)
 
-    hubs_Model_run <- Run_Hubs_Model(runCount, swpGraph, randGraph, hubThreshold, 
+    hubs_Model_run = Run_Hubs_Model(runCount, swpGraph, randGraph, hubThreshold, 
                            timeSteps)
 
     # Increment for next run
     # ----------------------
-    runCount <- runCount + 1
+    runCount = runCount + 1
     setwd("..") # Go up a directory
 }
 print(warnings())

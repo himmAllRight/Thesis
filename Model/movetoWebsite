@@ -1,0 +1,3 @@
+#!/bin/bash
+scp -vCr Humphries_Gurney_Like_runs_Hubs.tar.gz ryanhimm@ryanhimmelwright.com:~/public_html/thesis/data
+scp -vCr Humphries_Gurney_Like_runs_Rand.tar.gz ryanhimm@ryanhimmelwright.com:~/public_html/thesis/data
