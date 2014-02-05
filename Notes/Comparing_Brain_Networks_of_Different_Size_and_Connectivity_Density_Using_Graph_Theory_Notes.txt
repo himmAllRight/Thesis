@@ -1,0 +1,33 @@
+- To date, small world organizeation in human functional networks have primarily been studied in resting state.
+
+- Things such as size of the network can change the graph measures, even if the topology remains identical
+	- There is no approved, unbiased method for empirical data. 
+	- All methods have their advantages and disadvantages.
+
+- Graph Analysis  Measures:
+		- Watts & Strogatz:
+			- Node count (n): number of nodes
+			- Average degree (k): denotes the average number of edges per node.
+			- Degree distribution: indicates the distribution of the network's nodal degree values.
+			- Characteristic path length (L): the average number of edges in the shortest paths between every pair of nodes in the network.
+			- Average clustering coefficient (C): represents the probability that neighbors of a node are also connected.
+				- Indicates the occurrence of clusters of cliques in the network.
+
+- In experimental studies, specific voxels, EEG sensors, or recording sites are listed as nodes, and the threshold correlation between them generates the edges.
+	- The number of nodes in the network depends on the number of recording sites.
+		- For EEG and MEG, this is typically 16-150 nodes.
+		- For MRI based methods, relatively small scale parcellation schemes are usually adapted like
+			- ALL (Automated Anatomical Labeling), containing 90 nodes
+			- ANIMAL (Automatic Nonlinear Imaging Matching and Anatomical Labeling), containing 70 nodes.
+			- Other voxel methods have been used
+		- It is with these small numbers of nodes that the effects of different network sizes cannot be ignored.
+
+Different approaches for constructing the adjacency matrix:
+- Fixed threshold: k-dependence
+	- usually 3 methods for determining a threshold
+		1) uses a 5% sig level as a threshold in order to omit connectivity values by chance
+		2) one selects an arbitrary value as a threshold, with which one roughly obtains a certain desired average degree of network
+		3) one defines the threshold as large as possible while guaranteeing that all nodes are connected.
+	* Connectivity values often vary between subjects and condtitions, which may yield a differences. (might need multiple thresholds)
+
+
