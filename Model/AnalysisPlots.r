@@ -2,7 +2,6 @@
 
 library(stringr)
 
-print("Debug1")
 
 MakeDataMatrix <- function(fileName){
   print(fileName)
@@ -10,7 +9,6 @@ MakeDataMatrix <- function(fileName){
   
   return(dataMatrix)
 }
-print("Debug2")
 # Plots the Sws data for each individual run, and adds it the the cumulative
 # Sws data.frame for the cumulative plot.
 PlotSws <- function(dataMatrix, filename, cumulativeSws, runCount){
@@ -28,7 +26,6 @@ PlotSws <- function(dataMatrix, filename, cumulativeSws, runCount){
   cumulativeSws[,runCount] <- dataMatrix$Sws # add data to cumulative dataFrame
   return(cumulativeSws)
 }
-print("Debug3")
 # Plots cumulative Sws plot.
 PlotCumulativeSws <- function(cumulativeSws){
   plotName = paste("CumulativeSwsPlot.png")
@@ -43,7 +40,6 @@ PlotCumulativeSws <- function(cumulativeSws){
 
   dev.off() # close file
 }
-print("Debug4")
 
 PlotPathLength <- function(dataMatrix, filename, cumulativePathLength, runCount){
   plotName = paste("PathLengthPlot_", unlist(str_split(filename,"_"))[1], ".png", sep="") 
@@ -61,7 +57,6 @@ PlotPathLength <- function(dataMatrix, filename, cumulativePathLength, runCount)
   cumulativePathLength[,runCount] <- dataMatrix$avg_Path_Length # add data to cumulative dataFrame
   return(cumulativePathLength)
 }
-print("Debug5")
 # Plots cumulative PathLength plot.
 PlotCumulativePathLength <- function(cumulativePathLength){
   plotName = paste("CumulativePathLengthPlot.png")
@@ -76,7 +71,6 @@ PlotCumulativePathLength <- function(cumulativePathLength){
 
   dev.off() # close file
 }
-print("Debug6")
 
 PlotClustering <- function(dataMatrix, filename, cumulativeClustering, runCount){
   plotName = paste("TransitivityPlot_", unlist(str_split(filename,"_"))[1], ".png", sep="") 
@@ -94,7 +88,6 @@ PlotClustering <- function(dataMatrix, filename, cumulativeClustering, runCount)
   cumulativeClustering[,runCount] <- dataMatrix$Transitivity # add data to cumulative dataFrame
   return(cumulativeClustering)
 }
-print("Debug7")
 # Plots cumulative Clustering plot.
 PlotCumulativeClustering <- function(cumulativeClustering){
   plotName = paste("CumulativeTransitivityPlot.png")
@@ -109,10 +102,6 @@ PlotCumulativeClustering <- function(cumulativeClustering){
 
   dev.off() # close file
 }
-print("Debug8")
-PlotHubCount <- function(dataMatrix, filename, cumulativeHubCount, runCount){
-}
-print("Debug8")
 PlotHubCount <- function(dataMatrix, filename, cumulativeHubCount, runCount){
   plotName = paste("HubCountPlot_", unlist(str_split(filename,"_"))[1], ".png", sep="") 
   png(plotName)
@@ -129,7 +118,6 @@ PlotHubCount <- function(dataMatrix, filename, cumulativeHubCount, runCount){
   cumulativeHubCount[,runCount] <- dataMatrix$hubCount # add data to cumulative dataFrame
   return(cumulativeHubCount)  
 }
-print("Debug9")
 # Plots cumulative Hub Count.
 PlotCumulativeHubCount <- function(cumulativeHubCount){
   plotName = paste("CumulativeHubCountPlot.png")
@@ -145,7 +133,6 @@ PlotCumulativeHubCount <- function(cumulativeHubCount){
 
   dev.off() # close file
 }
-print("Debug10")
 # Plots new Clustering Coefficient
 PlotCC <- function(dataMatrix, filename, cumulativeCC, runcount){
   plotName = paste("CCPlot_", unlist(str_split(filename,"_"))[1], ".png", sep="") 
@@ -163,7 +150,6 @@ PlotCC <- function(dataMatrix, filename, cumulativeCC, runcount){
   cumulativeCC[,runCount] <- dataMatrix$Clustering # add data to cumulative dataFrame
   return(cumulativeCC)  
 }
-print("Debug11")
 # Plots cumulative CC.
 PlotCumulativeCC <- function(cumulativeCC){
   plotName = paste("CumulativeCCPlot.png")
@@ -179,7 +165,6 @@ PlotCumulativeCC <- function(cumulativeCC){
 
   dev.off() # close file
 }
-print("Debug12")
 # Plots new Sws2
 PlotSws2 <- function(dataMatrix, filename, cumulativeSws2, runcount){
   plotName = paste("Sws2Plot_", unlist(str_split(filename,"_"))[1], ".png", sep="") 
@@ -198,7 +183,6 @@ PlotSws2 <- function(dataMatrix, filename, cumulativeSws2, runcount){
   return(cumulativeSws2)
 }
 
-print("Debug13")
 # Plots cumulative Sws2
 PlotCumulativeSws2 <- function(cumulativeSws2){
   plotName = paste("CumulativeSws2Plot.png")
@@ -218,14 +202,12 @@ PlotCumulativeSws2 <- function(cumulativeSws2){
 #------------------------------- Execution Code --------------------------------
 #-------------------------------------------------------------------------------
 
-print("Debug14")
 # Set currDir to directory the script is run from.
 currDir = getwd()
 setwd(currDir)
 
 paramList = Sys.glob("ModelRun*")
 count = 1
-print("Debug15")
 # Loops through each folder containing runs of a different parameter set.
 for(paramSet in paramList){
   print(paramSet)
@@ -245,7 +227,7 @@ for(paramSet in paramList){
   # loops through the data file for each run.
   runCount = 1
   for( run in runsList){
-    print("Ryan :) ")    
+    print("In run. ")    
     print(run)
     
     dataMatrix            <- MakeDataMatrix(run)
@@ -287,3 +269,6 @@ for(paramSet in paramList){
     system("mv Sws2Plot* Sws2Plots/")
 
 
+  setwd("..")  # Move up a directory
+}
+print("ugh")
