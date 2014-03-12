@@ -1,0 +1,20 @@
+#!/bin/bash
+
+for m in ModelRun_*
+do
+
+  cd $m
+  for d in ModelRun_*
+  do
+    cd $d
+    cp ../../Regression_Plot.r .
+      for f in run*
+      do
+        Rscript Regression_Plot.r $f 6
+      done
+    mkdir Reg
+    mv *Regression* Reg/
+    cd ..
+  done
+  cd ..
+done
