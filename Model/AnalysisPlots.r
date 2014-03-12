@@ -9,6 +9,8 @@ MakeDataMatrix <- function(fileName){
   
   return(dataMatrix)
 }
+
+
 # Plots the Sws data for each individual run, and adds it the the cumulative
 # Sws data.frame for the cumulative plot.
 PlotSws <- function(dataMatrix, filename, cumulativeSws, runCount){
@@ -26,6 +28,8 @@ PlotSws <- function(dataMatrix, filename, cumulativeSws, runCount){
   cumulativeSws[,runCount] <- dataMatrix$Sws # add data to cumulative dataFrame
   return(cumulativeSws)
 }
+
+
 # Plots cumulative Sws plot.
 PlotCumulativeSws <- function(cumulativeSws){
   plotName = paste("CumulativeSwsPlot.png")
@@ -33,6 +37,7 @@ PlotCumulativeSws <- function(cumulativeSws){
 
   # Plot Data
   plot(cumulativeSws[,1], type='l', col="red") # Plots first line
+
   # loops through each run Data.
   for( i in seq(from=2, to=ncol(cumulativeSws), by=1)){
     lines(cumulativeSws[,i], col="red") # adds line for other runs
@@ -40,6 +45,7 @@ PlotCumulativeSws <- function(cumulativeSws){
 
   dev.off() # close file
 }
+
 
 PlotPathLength <- function(dataMatrix, filename, cumulativePathLength, runCount){
   plotName = paste("PathLengthPlot_", unlist(str_split(filename,"_"))[1], ".png", sep="") 
@@ -57,6 +63,8 @@ PlotPathLength <- function(dataMatrix, filename, cumulativePathLength, runCount)
   cumulativePathLength[,runCount] <- dataMatrix$avg_Path_Length # add data to cumulative dataFrame
   return(cumulativePathLength)
 }
+
+
 # Plots cumulative PathLength plot.
 PlotCumulativePathLength <- function(cumulativePathLength){
   plotName = paste("CumulativePathLengthPlot.png")
@@ -64,6 +72,7 @@ PlotCumulativePathLength <- function(cumulativePathLength){
 
   # Plot Data
   plot(cumulativePathLength[,1], type='l', col="red") # Plots first line
+
   # loops through each run Data.
   for( i in seq(from=2, to=ncol(cumulativePathLength), by=1)){
     lines(cumulativePathLength[,i], col="red") # adds line for other runs
@@ -71,6 +80,7 @@ PlotCumulativePathLength <- function(cumulativePathLength){
 
   dev.off() # close file
 }
+
 
 PlotClustering <- function(dataMatrix, filename, cumulativeClustering, runCount){
   plotName = paste("TransitivityPlot_", unlist(str_split(filename,"_"))[1], ".png", sep="") 
@@ -88,6 +98,8 @@ PlotClustering <- function(dataMatrix, filename, cumulativeClustering, runCount)
   cumulativeClustering[,runCount] <- dataMatrix$Transitivity # add data to cumulative dataFrame
   return(cumulativeClustering)
 }
+
+
 # Plots cumulative Clustering plot.
 PlotCumulativeClustering <- function(cumulativeClustering){
   plotName = paste("CumulativeTransitivityPlot.png")
@@ -95,6 +107,7 @@ PlotCumulativeClustering <- function(cumulativeClustering){
 
   # Plot Data
   plot(cumulativeClustering[,1], type='l', col="red") # Plots first line
+
   # loops through each run Data.
   for( i in seq(from=2, to=ncol(cumulativeClustering), by=1)){
     lines(cumulativeClustering[,i], col="red") # adds line for other runs
@@ -102,6 +115,8 @@ PlotCumulativeClustering <- function(cumulativeClustering){
 
   dev.off() # close file
 }
+
+
 PlotHubCount <- function(dataMatrix, filename, cumulativeHubCount, runCount){
   plotName = paste("HubCountPlot_", unlist(str_split(filename,"_"))[1], ".png", sep="") 
   png(plotName)
@@ -118,6 +133,8 @@ PlotHubCount <- function(dataMatrix, filename, cumulativeHubCount, runCount){
   cumulativeHubCount[,runCount] <- dataMatrix$hubCount # add data to cumulative dataFrame
   return(cumulativeHubCount)  
 }
+
+
 # Plots cumulative Hub Count.
 PlotCumulativeHubCount <- function(cumulativeHubCount){
   plotName = paste("CumulativeHubCountPlot.png")
@@ -125,6 +142,7 @@ PlotCumulativeHubCount <- function(cumulativeHubCount){
 
   # Plot Data
   plot(cumulativeHubCount[,1], type='l', col="red") # Plots first line
+
   # loops through each run Data.
   print(paste("hubcount ncol: ", ncol(cumulativeHubCount)))
   for( i in seq(from=2, to=ncol(cumulativeHubCount), by=1)){
@@ -133,6 +151,8 @@ PlotCumulativeHubCount <- function(cumulativeHubCount){
 
   dev.off() # close file
 }
+
+
 # Plots new Clustering Coefficient
 PlotCC <- function(dataMatrix, filename, cumulativeCC, runcount){
   plotName = paste("CCPlot_", unlist(str_split(filename,"_"))[1], ".png", sep="") 
@@ -150,6 +170,8 @@ PlotCC <- function(dataMatrix, filename, cumulativeCC, runcount){
   cumulativeCC[,runCount] <- dataMatrix$Clustering # add data to cumulative dataFrame
   return(cumulativeCC)  
 }
+
+
 # Plots cumulative CC.
 PlotCumulativeCC <- function(cumulativeCC){
   plotName = paste("CumulativeCCPlot.png")
@@ -157,6 +179,7 @@ PlotCumulativeCC <- function(cumulativeCC){
 
   # Plot Data
   plot(cumulativeCC[,1], type='l', col="red") # Plots first line
+
   # loops through each run Data.
   print(paste("cumulativeCC ncol: ", ncol(cumulativeCC)))
   for( i in seq(from=2, to=ncol(cumulativeCC), by=1)){
@@ -165,6 +188,8 @@ PlotCumulativeCC <- function(cumulativeCC){
 
   dev.off() # close file
 }
+
+
 # Plots new Sws2
 PlotSws2 <- function(dataMatrix, filename, cumulativeSws2, runcount){
   plotName = paste("Sws2Plot_", unlist(str_split(filename,"_"))[1], ".png", sep="") 
@@ -183,6 +208,7 @@ PlotSws2 <- function(dataMatrix, filename, cumulativeSws2, runcount){
   return(cumulativeSws2)
 }
 
+
 # Plots cumulative Sws2
 PlotCumulativeSws2 <- function(cumulativeSws2){
   plotName = paste("CumulativeSws2Plot.png")
@@ -190,6 +216,7 @@ PlotCumulativeSws2 <- function(cumulativeSws2){
 
   # Plot Data
   plot(cumulativeSws2[,1], type='l', col="red") # Plots first line
+
   # loops through each run Data.
   for( i in seq(from=2, to=ncol(cumulativeSws2), by=1)){
     lines(cumulativeSws2[,i], col="red") # adds line for other runs
@@ -197,6 +224,7 @@ PlotCumulativeSws2 <- function(cumulativeSws2){
 
   dev.off() # close file
 }
+
 
 #-------------------------------------------------------------------------------
 #------------------------------- Execution Code --------------------------------
@@ -208,6 +236,7 @@ setwd(currDir)
 
 paramList = Sys.glob("ModelRun*")
 count = 1
+
 # Loops through each folder containing runs of a different parameter set.
 for(paramSet in paramList){
   print(paramSet)
@@ -271,4 +300,3 @@ for(paramSet in paramList){
 
   setwd("..")  # Move up a directory
 }
-print("ugh")
