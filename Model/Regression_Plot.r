@@ -4,12 +4,15 @@
 library(stringr)	# String Library
 
 # Use command arg to set input file name
-args      <- commandArgs(trailingOnly = TRUE)
-inputFile <- args[1]
-degreeMax <- args[2] 	# What degree the regressions should go to (up to 6)
-inputType <- ".txt"
+args        <- commandArgs(trailingOnly = TRUE)
+inputFile   <- args[1]
+degreeMax   <- args[2] 	# degree the regressions plots go to (up to 6)
+inputType   <- ".txt"
 
-plotName  <- paste(unlist(str_split(inputFile,inputType))[1], "_RegressionPlot.png", sep="")
+plotName    <- paste(unlist(str_split(inputFile,inputType))[1],
+			   "_RegressionPlot",degreeMax,".png", sep="")
+outFileName <- paste(unlist(str_split(inputFile,inputType))[1], 
+			   "_Regressions",degreeMax,".txt", sep="")
 
 # Read in Data
 data <- read.csv(inputFile, header = TRUE, sep="\t")
@@ -28,37 +31,47 @@ fit6 <- lm(data$Sws2 ~ poly(data$step, 6, raw = TRUE))
 
 
 # Print the summaries of the regressions
-print("Second Degree Regression")
-print("------------------------")
-summary(fit2)
+write("Second Degree Regression", file = outFileName, append = TRUE)
+write("------------------------", file = outFileName, append = TRUE)
+out <- capture.output(summary(fit2), file = NULL, append = FALSE)
+write(out, file = outFileName, append = TRUE)
 
-print("Third Degree Regression")
-print("-----------------------")
-summary(fit3)
 
-print("Fourth Degree Regression")
-print("-----------------------")
-summary(fit4)
+if(degreeMax > 2){
+	write("Third Degree Regression", file = outFileName, append = TRUE)
+	write("------------------------", file = outFileName, append = TRUE)
+	out <- capture.output(summary(fit3), file = NULL, append = FALSE)
+	write(out, file = outFileName, append = TRUE)
+}
 
-print("Fifth Degree Regression")
-print("-----------------------")
-summary(fit5)
+if(degreeMax > 3){
+	write("Fourth Degree Regression", file = outFileName, append = TRUE)
+	write("------------------------", file = outFileName, append = TRUE)
+	out <- capture.output(summary(fit4), file = NULL, append = FALSE)
+	write(out, file = outFileName, append = TRUE)
+}
 
-print("Sixth Degree Regression")
-print("-----------------------")
-summary(fit6)
+if(degreeMax > 4){
+	write("Fifth Degree Regression", file = outFileName, append = TRUE)
+	write("------------------------", file = outFileName, append = TRUE)
+	out <- capture.output(summary(fit5), file = NULL, append = FALSE)
+	write(out, file = outFileName, append = TRUE)
+}
 
-# Run an ANOVA on the fits
-print("ANOVA of the two Fits")
-print("---------------------")
-anova(fit2, fit3)
+if(degreeMax > 5){
+	write("Sixth Degree Regression", file = outFileName, append = TRUE)
+	write("------------------------", file = outFileName, append = TRUE)
+	out <- capture.output(summary(fit6), file = NULL, append = FALSE)
+	write(out, file = outFileName, append = TRUE)
+}
+
 
 # Plot Sws data and Regressions
 png(plotName)
 plot(data$step, data$Sws2, type="l", lwd=3)
 
 # Add second degree fit to plot
-points(data$step, predict(fit2), type="l", col="red", lwd=2, label="2nd Degree")
+points(data$step, predict(fit2), type="l", col="red", lwd=2)
 
 if(degreeMax > 2){
 	# Add third degree fit to plot
