@@ -27,7 +27,14 @@ MakeRandNetwork <- function(dimension, size, nei, swpGraph){
 FindHubs <- function(runCount, hubThreshold, swpGraph){
   hubScore  = hub.score(swpGraph) 
   hubValues = hubScore$vector      # Takes just values from hub score
-  # Replaces all hubs with a 1, and other vertices with a 0.
+
+ 
+# This is what needs to be changed for hubs2. New HUB Identifier
+
+
+
+
+ # Replaces all hubs with a 1, and other vertices with a 0.
   hubMatrix = replace(replace(hubValues,hubValues >= hubThreshold, 1),
                               hubValues < hubThreshold,0)  
   return(hubMatrix)
@@ -95,6 +102,11 @@ Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold,
     write(paste(step,'\t',HubCounts(FindHubs(runCount, hubThreshold, swpGraph)),
           '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
           swsList$swpClustering), file= runLogOutput, append = TRUE, sep="," )
+
+    # Print degree information
+    PrintDegrees(swpGraph, runCount, step)
+    
+
     }
 }
 
@@ -143,6 +155,13 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
   plot(swpGraph)
   png(file="rand_plot1.png")
   plot(randGraph)
+}
+
+# Writes the degree of each node in the graphs to a file during each step.
+PrintDegrees <- function(swpGraph, runCount, step){
+  runDegreeOutput = paste('run',runCount,'_DegreeOutput.txt', sep="")
+  write(paste(step, \t, degree(swpGraph)), file=runDegreesOutput, append = TRUE,
+              sep = "")
 }
 
 ################################################################################
