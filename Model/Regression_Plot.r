@@ -103,7 +103,7 @@ png(plotName)
 plot(data$step, data$Sws2, type="l", lwd=3)
 
 # Add second degree fit to plot
-points(data$step, predict(fit2), type="l", col="yellow", lwd=2)
+points(data$step, predict(fit2), type="l", col="yellowhimm", lwd=2)
 
 if(degreeMax > 2){
 	# Add third degree fit to plot
@@ -144,5 +144,5 @@ if(degreeMax > 9){
 	# Add 10th degree fit to plot
 	points(data$step, predict(fit10), type="l", col="black", lwd=2)
 }
-s
+
 dev.off()
