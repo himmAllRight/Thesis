@@ -26,8 +26,12 @@ fit4 <- lm(data$Sws2 ~ data$step + I(data$step^2) + I(data$step^3) + I(data$step
 # Alternative way to writting the regressions.
 #fit2b <- lm(data$Sws2 ~ poly(data$step, 2, raw = TRUE))
 #fit3b <- lm(data$Sws2 ~ poly(data$step, 3, raw = TRUE))
-fit5 <- lm(data$Sws2 ~ poly(data$step, 5, raw = TRUE))
-fit6 <- lm(data$Sws2 ~ poly(data$step, 6, raw = TRUE))
+fit5  <- lm(data$Sws2 ~ poly(data$step, 5,  raw = TRUE))
+fit6  <- lm(data$Sws2 ~ poly(data$step, 6,  raw = TRUE))
+fit7  <- lm(data$Sws2 ~ poly(data$step, 7,  raw = TRUE))
+fit8  <- lm(data$Sws2 ~ poly(data$step, 8,  raw = TRUE))
+fit9  <- lm(data$Sws2 ~ poly(data$step, 9,  raw = TRUE))
+fit10 <- lm(data$Sws2 ~ poly(data$step, 10, raw = TRUE))
 
 
 # Print the summaries of the regressions
