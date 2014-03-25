@@ -69,13 +69,41 @@ if(degreeMax > 5){
 	write(out, file = outFileName, append = TRUE)
 }
 
+if(degreeMax > 6){
+	write("Seventh Degree Regression", file = outFileName, append = TRUE)
+	write("------------------------", file = outFileName, append = TRUE)
+	out <- capture.output(summary(fit7), file = NULL, append = FALSE)
+	write(out, file = outFileName, append = TRUE)
+}
+
+if(degreeMax > 7){
+	write("Eigth Degree Regression", file = outFileName, append = TRUE)
+	write("------------------------", file = outFileName, append = TRUE)
+	out <- capture.output(summary(fit8), file = NULL, append = FALSE)
+	write(out, file = outFileName, append = TRUE)
+}
+
+if(degreeMax > 8){
+	write("Ninth Degree Regression", file = outFileName, append = TRUE)
+	write("------------------------", file = outFileName, append = TRUE)
+	out <- capture.output(summary(fit9), file = NULL, append = FALSE)
+	write(out, file = outFileName, append = TRUE)
+}
+
+if(degreeMax > 9){
+	write("Sixth Degree Regression", file = outFileName, append = TRUE)
+	write("------------------------", file = outFileName, append = TRUE)
+	out <- capture.output(summary(fit10), file = NULL, append = FALSE)
+	write(out, file = outFileName, append = TRUE)
+}
+
 
 # Plot Sws data and Regressions
 png(plotName)
 plot(data$step, data$Sws2, type="l", lwd=3)
 
 # Add second degree fit to plot
-points(data$step, predict(fit2), type="l", col="red", lwd=2)
+points(data$step, predict(fit2), type="l", col="yellow", lwd=2)
 
 if(degreeMax > 2){
 	# Add third degree fit to plot
@@ -97,4 +125,24 @@ if(degreeMax > 5){
 	points(data$step, predict(fit6), type="l", col="cyan", lwd=2)
 }
 
+if(degreeMax > 6){
+	# Add 7th degree fit to plot
+	points(data$step, predict(fit7), type="l", col="purple", lwd=2)
+}
+
+if(degreeMax > 7){
+	# Add 8th degree fit to plot
+	points(data$step, predict(fit8), type="l", col="brown", lwd=2)
+}
+
+if(degreeMax > 8){
+	# Add 9th degree fit to plot
+	points(data$step, predict(fit9), type="l", col="red", lwd=2)
+}
+
+if(degreeMax > 9){
+	# Add 10th degree fit to plot
+	points(data$step, predict(fit10), type="l", col="black", lwd=2)
+}
+s
 dev.off()
