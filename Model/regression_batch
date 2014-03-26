@@ -1,18 +1,16 @@
 #!/bin/bash
 
-# Experiment run
 for m in ModelRun_*
 do
-  # parameter sets
+
   cd $m
   for d in ModelRun_*
   do
     cd $d
     cp ../../Regression_Plot.r .
-      # each trial
       for f in run*
       do
-        Rscript Regression_Plot.r $f 6
+        Rscript Regression_Plot.r $f 9 10
       done
     mkdir Reg
     mv *Regression* Reg/
