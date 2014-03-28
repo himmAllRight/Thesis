@@ -107,10 +107,14 @@ HubHub <- function(swpGraph, hubs){
 # Run model that attacks the hubs first.
 Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold, 
                            timeSteps){
-  # Model Print Out 
+  
+  # Initialzie Model Print Out files
+  # Graph Attributes
   runLogOutput = paste('run',runCount,'_logOutput.txt', sep="")
   write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Transitivity \t Clustering \t Sws2 '), 
         file= runLogOutput, append = TRUE, sep=",")
+
+  degreeOutput = paste('run',runCount,'_DegreeLog.txt', sep="")
 
  # Returns a list of the vertex number of all the hubs. 
   for(step in seq(from=1, to=timeSteps, by=1)){
@@ -179,6 +183,9 @@ print(paste('step: ', step))
           '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
           swsList$swpClustering,'\t', swsList$swpCC, '\t', swsList$Sws2 ),
           file= runLogOutput, append = TRUE, sep="," )
+
+    # Print Degree Distribution Data
+    PrintDegree(swpGraph, runCount, step)
     }
 }
 ################################################################################
@@ -227,6 +234,16 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
   plot(swpGraph)
   png(file="rand_plot1.png")
   plot(randGraph)
+}
+
+# Plots out the node degrees of a graph at each step.
+PrintDegree <- function(swpGraph, runCount, step){
+  degreeOutput = paste('run',runCount,'_DegreeLog.txt', sep="")
+  print(degreeOutput)
+  d <- degree(swpGraph)
+  print(length(d))
+  cat(d, fill= 3*length(d), file="~/Desktop/degreeLog.txt", sep=",", append = TRUE)
+  cat(d, fill= 3*length(d), file=degreeOutput, sep=",", append = TRUE)
 }
 
 ################################################################################
@@ -291,6 +308,8 @@ for( i in seq(from=1, to= trialCount, by=1)){
 
     hubs_Model_run <- Run_Hubs_Model(runCount, swpGraph, randGraph, hubThreshold, 
                            timeSteps)
+
+
 
     # Increment for next run
     # ----------------------
