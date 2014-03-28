@@ -239,7 +239,6 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
 # Plots out the node degrees of a graph at each step.
 PrintDegree <- function(swpGraph, runCount, step){
   degreeOutput = paste('run',runCount,'_DegreeLog.txt', sep="")
-  print(degreeOutput)
   d <- degree(swpGraph)
   cat(d, fill= 3*length(d), file=degreeOutput, sep=",", append = TRUE)
 }
@@ -312,6 +311,17 @@ for( i in seq(from=1, to= trialCount, by=1)){
     # Increment for next run
     # ----------------------
     runCount <- runCount + 1
+
+    if(runCount >= trialCount){
+      # Make directory for degree printouts, and move them there
+      system('mkdir DegreeLogs')
+      system('mv *_DegreeLog.txt DegreeLogs')
+    }
+
     setwd("..") # Go up a directory
 }
+
+
+
+
 print(warnings())
