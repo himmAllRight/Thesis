@@ -129,6 +129,9 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
           '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
           swsList$swpClustering,'\t', swsList$swpCC, '\t', swsList$Sws2 ),
           file= runLogOutput, append = TRUE, sep="," )
+
+    # Print Degree Distribution Data
+    PrintDegree(swpGraph, runCount, step)
     }
 }
 
@@ -198,6 +201,13 @@ PlotGraph <- function(runCount,tag, swpGraph, randGraph, hubMatrix){
   png(file="rand_plot1.png")
   plot(randGraph, vertex.size=3, vertex.label=NA, edge.arrow.size=0)
   dev.off()
+}
+
+# Plots out the node degrees of a graph at each step.
+PrintDegree <- function(swpGraph, runCount, step){
+  degreeOutput = paste('run',runCount,'_DegreeLog.txt', sep="")
+  d <- degree(swpGraph)
+  cat(d, fill= 3*length(d), file=degreeOutput, sep=",", append = TRUE)
 }
 
 ################################################################################
@@ -284,6 +294,13 @@ for( i in seq(from=1, to= trialCount, by=1)){
   # Increment for next run
   # ----------------------
   runCount = runCount + 1
+
+  # Make directory for degree printouts, and move them there
+  if(runCount >= trialCount){
+    system('mkdir DegreeLogs')
+    system('mv *_DegreeLog.txt DegreeLogs')
+  }
+
   setwd("..") # Go up a directory
 }
 print(warnings())

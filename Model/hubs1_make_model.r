@@ -312,8 +312,8 @@ for( i in seq(from=1, to= trialCount, by=1)){
     # ----------------------
     runCount <- runCount + 1
 
+    # Make directory for degree printouts, and move them there
     if(runCount >= trialCount){
-      # Make directory for degree printouts, and move them there
       system('mkdir DegreeLogs')
       system('mv *_DegreeLog.txt DegreeLogs')
     }
