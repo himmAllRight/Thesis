@@ -241,8 +241,6 @@ PrintDegree <- function(swpGraph, runCount, step){
   degreeOutput = paste('run',runCount,'_DegreeLog.txt', sep="")
   print(degreeOutput)
   d <- degree(swpGraph)
-  print(length(d))
-  cat(d, fill= 3*length(d), file="~/Desktop/degreeLog.txt", sep=",", append = TRUE)
   cat(d, fill= 3*length(d), file=degreeOutput, sep=",", append = TRUE)
 }
 
