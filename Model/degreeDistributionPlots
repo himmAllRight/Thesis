@@ -1,0 +1,48 @@
+#!/bin/bash
+
+for topDir in *
+do
+
+	if [ -d "$topDir" ]
+		then
+		echo Directory: "$topDir"
+		cd "$topDir"
+		cd "DegreeData"
+
+		# set temp test window data file, until model does it
+		rm windowData
+		echo -e "0,40" >> windowData
+		echo -e "0,42" >> windowData
+		echo -e "0,39" >> windowData
+		echo -e "0,25" >> windowData
+		echo -e "0,45" >> windowData
+
+		# Enter each degreeDist Data folder
+		for degreeDist in *degreeDistData
+		do
+			if [ -d $degreeDist ]
+				then
+				cd "$degreeDist" 	# enter data folder
+				mkdir plots			# make plots folder
+
+				for data in *DegreeDist.dat
+				do
+					echo start GNUPlot
+					## GNU Plot Stuff
+				
+					echo "$degreeDist" "$data"
+
+					echo Done GNUPLOT
+
+
+				done
+				cd ..
+			fi
+		done
+
+		# go back to top folder
+		cd ../..
+	else
+		echo non-Dir: "$topDir"
+	fi
+done
