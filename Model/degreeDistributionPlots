@@ -11,11 +11,7 @@ do
 
 		# set temp test window data file, until model does it
 		rm windowData
-		echo -e "0,40" >> windowData
-		echo -e "0,42" >> windowData
-		echo -e "0,39" >> windowData
-		echo -e "0,25" >> windowData
-		echo -e "0,45" >> windowData
+
 
 		# Enter each degreeDist Data folder
 		for degreeDist in *degreeDistData
@@ -25,14 +21,34 @@ do
 				cd "$degreeDist" 	# enter data folder
 				mkdir plots			# make plots folder
 
+				degreeMax=`sed '1q;d' windowInfo.txt`
+				percentMax=`sed '2q;d' windowInfo.txt`
+
+				echo "$degreeMax"
+				echo "$percentMax"
+				count=1
 				for data in *DegreeDist.dat
 				do
 					echo start GNUPlot
-					## GNU Plot Stuff
-				
 					echo "$degreeDist" "$data"
+					echo "$count"
+
+					## GNU Plot Stuff
+					gnuplot <<- EOF
+						set title "Degree Distribution Plot"
+						set xlabel "Degree"
+						set ylabel "Percentage"
+						set term gif
+						set xrange [0:${degreeMax}]
+						set yrange [0:${percentMax}]
+						set output "plots/DegreeDistPlot_step${count}.gif"
+						plot "${data}" with lines
+					EOF
+
+					(( count++ ))
 
 					echo Done GNUPLOT
+
 
 
 				done
