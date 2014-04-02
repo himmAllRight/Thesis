@@ -184,8 +184,12 @@ print(paste('step: ', step))
           swsList$swpClustering,'\t', swsList$swpCC, '\t', swsList$Sws2 ),
           file= runLogOutput, append = TRUE, sep="," )
 
-    # Print Degree Distribution Data
+    # Print Degree Data
     PrintDegree(swpGraph, runCount, step)
+    # Print Degree Distrribution Data
+    PrintDegreeDist(swpGraph, runCount, step)
+
+
     }
 }
 ################################################################################
@@ -238,9 +242,44 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
 
 # Plots out the node degrees of a graph at each step.
 PrintDegree <- function(swpGraph, runCount, step){
-  degreeOutput = paste('run',runCount,'_DegreeLog.txt', sep="")
+  # Change to DegreeData folder
+  setwd('DegreeData')
+
+  # Make degree Matrix
   d <- degree(swpGraph)
+
+  # Write to file
+  degreeOutput = paste('run',runCount,'_DegreeLog.txt', sep="")
   cat(d, fill= 3*length(d), file=degreeOutput, sep=",", append = TRUE)
+
+  setwd('..')   # Jump out of folder
+}
+
+
+
+# Plots out the degree distribution each step.
+PrintDegreeDist <- function(swpGraph, runCount, step){
+  # Initialize data Folder
+  folder = paste('run_',runCount, 'degreeDistData', sep = "" )
+
+  # Change to Degree Distribution dir
+  setwd('DegreeData')
+  
+  # If a sub-directory does not exit for current run, make it.
+  system(paste('mkdir -p ', folder, sep = "" ))
+  setwd(folder)     # Set working Directory to the Degree Run
+  
+  # Generate degree distribution matrix
+  d <- degree.distribution(swpGraph)
+
+  # Write to file
+  degreeDistOutput = paste('run',runCount,'_step', step,'_DegreeDist.dat', sep="")
+  for(i in seq(from=1, to= length(d), by=1)){
+    write(paste(i,'\t',d[i]), file = degreeDistOutput, append = TRUE)
+  }
+
+  setwd('../..')    # Back out of degree run directory
+
 }
 
 ################################################################################
@@ -272,6 +311,9 @@ for( i in seq(from=1, to= trialCount, by=1)){
   print(paste('mkdir ',name, sep=""))
   system(paste('mkdir ', name, sep=""))
   setwd(paste(name, sep=""))
+
+  system('mkdir DegreeData')
+
   print(getwd())
 
   #-----------------------------------------------
