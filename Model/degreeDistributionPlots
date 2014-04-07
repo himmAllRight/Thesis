@@ -9,9 +9,8 @@ do
 		cd "$topDir"
 		cd "DegreeData"
 
-		# set temp test window data file, until model does it
-		rm windowData
-
+		# Make folder for animations
+		mkdir "animations"
 
 		# Enter each degreeDist Data folder
 		for degreeDist in *degreeDistData
@@ -39,7 +38,7 @@ do
 					## GNU Plot Stuff
 					gnuplot <<- EOF
 						set title "Degree Distribution Plot"
-						set xlabel "Degree"
+						set xlabel "Degree K"
 						set ylabel "Percentage"
 						set term gif
 						set xrange [0:${degreeMax}]
@@ -51,11 +50,20 @@ do
 					(( count++ ))
 
 					echo Done GNUPLOT
-
-
-
 				done
-				cd ..
+
+				cd plots
+
+				echo --------------
+				echo Make Animation
+				echo --------------
+				# Make ordered plot list
+				plotList=`ls DegreeDistPlot_step*.gif | sort -n -t p -k 2`
+
+				# Make plot animation
+				gifsicle --delay=5 $plotList> ../../animations/${degreeDist}_animation.gif
+
+				cd ../..
 			fi
 		done
 
