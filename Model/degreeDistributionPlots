@@ -27,7 +27,10 @@ do
 				echo "$degreeMax"
 				echo "$percentMax"
 				count=1
-				for data in *DegreeDist.dat
+				
+				orderedData=`ls *.dat | sort -n -t p -k 2`
+				echo $orderedData
+				for data in $orderedData
 				do
 					echo start GNUPlot
 					echo "$degreeDist" "$data"
