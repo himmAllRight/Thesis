@@ -89,6 +89,12 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
   write(paste('step \t hubCount \t Sws \t avg_Path_Length \t Transitivity \t Clustering \t Sws2 '), 
         file= runLogOutput, append = TRUE, sep=",")
   print("in model Run now ") 
+ 
+  degreeOutput = paste('run',runCount,'_DegreeLog.txt', sep="")
+
+  degreeMax <- 0  # set window max for plotting degree distribution
+  probMax   <- 0
+
   # Loops the model for specified amount of time (timeSteps)
   for ( step in seq(from=1, to=timeSteps, by=1)){
     print(paste("step: ",step))
@@ -120,6 +126,20 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
     z  <- sample(which(!(1:vcount(swpGraph) %in% xNeighbors)), 1)
 
     swpGraph[x,z] <- TRUE                  # Add edge between x and z
+
+
+
+    # Checks to see if new degreeMax
+    d  <- degree(swpGraph)
+    dd <- degree.distribution(swpGraph)
+    if(max(d) > degreeMax){
+      degreeMax <- max(d)
+    }
+    if(max(dd) > probMax){
+      probMax <- max(dd)
+    }
+
+
     
     # Print attributes to output file
     # -------------------------------
@@ -135,7 +155,8 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
     # Print Degree Data
     PrintDegree(swpGraph, runCount, step)
     # Print Degree Distrribution Data
-    PrintDegreeDist(swpGraph, runCount, step)
+    PrintDegreeDist(swpGraph, runCount, step, timeSteps, degreeMax, probMax)
+
     }
 }
 
@@ -225,7 +246,8 @@ PrintDegree <- function(swpGraph, runCount, step){
 
 
 # Plots out the degree distribution each step.
-PrintDegreeDist <- function(swpGraph, runCount, step){
+PrintDegreeDist <- function(swpGraph, runCount, step, timeSteps, degreeMax,
+                            probMax){
   # Initialize data Folder
   folder = paste('run_',runCount, 'degreeDistData', sep = "" )
 
@@ -243,6 +265,11 @@ PrintDegreeDist <- function(swpGraph, runCount, step){
   degreeDistOutput = paste('run',runCount,'_step', step,'_DegreeDist.dat', sep="")
   for(i in seq(from=1, to= length(d), by=1)){
     write(paste(i,'\t',d[i]), file = degreeDistOutput, append = TRUE)
+  }
+
+  # If last step
+  if(step == timeSteps){
+    write(paste(degreeMax, probMax), sep="\n", file = "windowInfo.txt")
   }
 
   setwd('../..')    # Back out of degree run directory

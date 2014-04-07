@@ -116,6 +116,9 @@ Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold,
 
   degreeOutput = paste('run',runCount,'_DegreeLog.txt', sep="")
 
+  degreeMax <- 0  # set window max for plotting degree distribution
+  probMax   <- 0
+
  # Returns a list of the vertex number of all the hubs. 
   for(step in seq(from=1, to=timeSteps, by=1)){
     # Swp Hubs
@@ -172,6 +175,16 @@ print(paste('step: ', step))
         }
       }
     }
+
+    # Checks to see if new degreeMax
+    d  <- degree(swpGraph)
+    dd <- degree.distribution(swpGraph)
+    if(max(d) > degreeMax){
+      degreeMax <- max(d)
+    }
+    if(max(dd) > probMax){
+      probMax <- max(dd)
+    }
     
 
 
@@ -187,8 +200,7 @@ print(paste('step: ', step))
     # Print Degree Data
     PrintDegree(swpGraph, runCount, step)
     # Print Degree Distrribution Data
-    PrintDegreeDist(swpGraph, runCount, step)
-
+    PrintDegreeDist(swpGraph, runCount, step, timeSteps, degreeMax, probMax)
 
     }
 }
@@ -258,7 +270,8 @@ PrintDegree <- function(swpGraph, runCount, step){
 
 
 # Plots out the degree distribution each step.
-PrintDegreeDist <- function(swpGraph, runCount, step){
+PrintDegreeDist <- function(swpGraph, runCount, step, timeSteps, degreeMax,
+                            probMax){
   # Initialize data Folder
   folder = paste('run_',runCount, 'degreeDistData', sep = "" )
 
@@ -277,6 +290,12 @@ PrintDegreeDist <- function(swpGraph, runCount, step){
   for(i in seq(from=1, to= length(d), by=1)){
     write(paste(i,'\t',d[i]), file = degreeDistOutput, append = TRUE)
   }
+
+  # If last step
+  if(step == timeSteps){
+    write(paste(degreeMax, probMax), sep="\n", file = "windowInfo.txt")
+  }
+
 
   setwd('../..')    # Back out of degree run directory
 
