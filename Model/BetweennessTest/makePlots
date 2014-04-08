@@ -1,0 +1,23 @@
+#!/bin/bash
+
+plotList=`ls *.dat | sort -n -t _ -k 2`
+
+mkdir plots
+
+count=1
+
+for data in $plotList
+do
+  gnuplot <<HERE
+    set title "Betweenness per node"
+    set xlabel "Nodes"
+    set ylabel "Betweenness Score"
+    set term gif
+    set output "plots/betweennessPlot_&{count}.gif
+    plot "${data}" with lines
+    HERE
+
+  (( count++ ))
+
+
+done
