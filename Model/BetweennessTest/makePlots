@@ -6,18 +6,26 @@ mkdir plots
 
 count=1
 
+
+
+
+
 for data in $plotList
-do
-  gnuplot <<HERE
-    set title "Betweenness per node"
-    set xlabel "Nodes"
-    set ylabel "Betweenness Score"
-    set term gif
-    set output "plots/betweennessPlot_&{count}.gif
-    plot "${data}" with lines
-    HERE
+        do
+          echo start GNUPlot
+          echo "$count"
 
-  (( count++ ))
+          ## GNU Plot Stuff
+          gnuplot <<HERE
+            set title "Betweenness Plot"
+            set xlabel "Sorted Nodes"
+            set ylabel "Betweenness Score"
+            set term gif
+            set output "plots/BetweennessPlot_${count}.gif"
+            plot "${data}" with lines
+HERE
 
+          (( count++ ))
 
-done
+          echo Done GNUPLOT
+        done
