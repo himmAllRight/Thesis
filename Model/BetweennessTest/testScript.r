@@ -18,7 +18,7 @@ for( dim in seq(from=2, to=5, by=1)){
       for( trial in seq(from = 1, to= trialCounts, by=1)){
         g <- watts.strogatz.game(4,size,1,p)
 
-        b <- betweenness(g)
+        b <- sort(betweenness(g))
 
         # Write to file
         betweennessOutput = paste("betweennessData_",count,".dat", sep="")
