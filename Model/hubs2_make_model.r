@@ -31,20 +31,20 @@ MakeRandNetwork <- function(dimension, size, nei, swpGraph){
 
 
 # Finds the hubs of a network.
-FindHubs <- function(runCount, hubThreshold, swpGraph){
+FindHubs <- function(runCount, hubSTD, swpGraph){
+  # Finds the betweenness hubs
+  # Based on the standard deviation of the mean of the betweenness score.
 
-# Part to replace in hubs2s
+  # Betweenness score for each node
+  b           <- betweenness(swpGraph)
+  bThreshold  <- mean(b)+(hubSTD*(sd(b)))
 
-  #hubScore  <- hub.score(swpGraph) 
-  #hubValues <- hubScore$vector      # Takes just values from hub score
+  # Replaces all hubs with a score above the threshold with a 1, and other
+  # verticies with a 0. This is a discrete hub list, as betweenness values are
+  # lost.
+  hubMatrix   <- replace(replace(b, b >= bThreshold, 1), b < bThreshold, 0)
 
-  betweenValues <- betweenness(swpGraph)
-  
 
-# Might not be needed with new hubs
-  # Replaces all hubs with a 1, and other vertices with a 0.
-  hubMatrix <- replace(replace(hubValues,hubValues >= hubThreshold, 1),
-                              hubValues < hubThreshold,0)  
   return(hubMatrix)
 }
 
@@ -113,7 +113,7 @@ HubHub <- function(swpGraph, hubs){
 ################################################################################
 
 # Run model that attacks the hubs first.
-Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold, 
+Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubSTD, 
                            timeSteps){
   
   # Initialzie Model Print Out files
@@ -124,16 +124,19 @@ Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold,
 
   degreeOutput = paste('run',runCount,'_DegreeLog.txt', sep="")
 
+  degreeMax <- 0  # set window max for plotting degree distribution
+  probMax   <- 0
+
  # Returns a list of the vertex number of all the hubs. 
   for(step in seq(from=1, to=timeSteps, by=1)){
     # Swp Hubs
-    swpHubMatrix  <- FindHubs(runCount, hubThreshold, swpGraph)
+    swpHubMatrix  <- FindHubs(runCount, hubSTD, swpGraph)
     swpHubInd     <- (which(swpHubMatrix %in% 1))
     swpNonHubs    <- which(!(1:length(swpHubMatrix) %in% swpHubInd))
 
 print(vcount(swpGraph))
 print(ecount(swpGraph))
-    
+print(swpHubInd)    
     # SWP hub-hub connections
     hubhub  <- HubHub(swpGraph, swpHubInd)
     hubhub1 <- hubhub$hubhub1  # used for x
@@ -180,6 +183,16 @@ print(paste('step: ', step))
         }
       }
     }
+
+    # Checks to see if new degreeMax
+    d  <- degree(swpGraph)
+    dd <- degree.distribution(swpGraph)
+    if(max(d) > degreeMax){
+      degreeMax <- max(d)
+    }
+    if(max(dd) > probMax){
+      probMax <- max(dd)
+    }
     
 
 
@@ -187,20 +200,23 @@ print(paste('step: ', step))
     # -------------------------------
     swsList <- CalcSws(swpGraph,randGraph)
     swpGamma  <-  transitivity(swpGraph, type="global", vids=NULL, weights=NULL)
-    write(paste(step,'\t',HubCounts(FindHubs(runCount, hubThreshold, swpGraph)),
+    write(paste(step,'\t',HubCounts(FindHubs(runCount, hubSTD, swpGraph)),
           '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
           swsList$swpClustering,'\t', swsList$swpCC, '\t', swsList$Sws2 ),
           file= runLogOutput, append = TRUE, sep="," )
 
-    # Print Degree Distribution Data
+    # Print Degree Data
     PrintDegree(swpGraph, runCount, step)
+    # Print Degree Distrribution Data
+    PrintDegreeDist(swpGraph, runCount, step, timeSteps, degreeMax, probMax)
+
     }
 }
 ################################################################################
 ############################## Printing Functions ##############################
 ################################################################################
 PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dimension, size,
-                            nei, p, hubThreshold){
+                            nei, p, hubSTD){
   # Generate output file of each run in each run directory
   outfileName = "../cumulative_attributes.txt"   
     
@@ -211,7 +227,7 @@ PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dimension, 
     write(paste('Size: ',size), file= outfileName, append = TRUE, sep= ", ")
     write(paste('Nei: ', nei), file= outfileName, append = TRUE, sep= ", ")
     write(paste('p: ',p), file= outfileName, append = TRUE, sep= ", ")
-    write(paste('hubThreshold: ', hubThreshold), file= outfileName,
+    write(paste('hubSTD: ', hubSTD), file= outfileName,
           append = TRUE, sep= ", ")
     write(paste('swpGraph Vertice count: ', vcount(swpGraph)), file= outfileName,
           append = TRUE, sep= ", ")
@@ -246,9 +262,51 @@ PlotGraph <- function(runCount, swpGraph, randGraph, hubMatrix){
 
 # Plots out the node degrees of a graph at each step.
 PrintDegree <- function(swpGraph, runCount, step){
-  degreeOutput = paste('run',runCount,'_DegreeLog.txt', sep="")
+  # Change to DegreeData folder
+  setwd('DegreeData')
+
+  # Make degree Matrix
   d <- degree(swpGraph)
+
+  # Write to file
+  degreeOutput = paste('run',runCount,'_DegreeLog.txt', sep="")
   cat(d, fill= 3*length(d), file=degreeOutput, sep=",", append = TRUE)
+
+  setwd('..')   # Jump out of folder
+}
+
+
+
+# Plots out the degree distribution each step.
+PrintDegreeDist <- function(swpGraph, runCount, step, timeSteps, degreeMax,
+                            probMax){
+  # Initialize data Folder
+  folder = paste('run_',runCount, 'degreeDistData', sep = "" )
+
+  # Change to Degree Distribution dir
+  setwd('DegreeData')
+  
+  # If a sub-directory does not exit for current run, make it.
+  system(paste('mkdir -p ', folder, sep = "" ))
+  setwd(folder)     # Set working Directory to the Degree Run
+  
+  # Generate degree distribution matrix
+  d <- degree.distribution(swpGraph)
+
+  # Write to file
+  degreeDistOutput = paste('run',runCount,'_step', step,'_DegreeDist.dat', sep="")
+  for(i in seq(from=1, to= length(d), by=1)){
+    write(paste(i,'\t',d[i]), file = degreeDistOutput, append = TRUE)
+  }
+
+  # If last step
+  if(step == timeSteps){
+    write(paste(degreeMax,"\n", probMax), sep="\n", file = "windowInfo.txt")
+  }
+
+
+  setwd('../..')    # Back out of degree run directory
+
 }
 
 ################################################################################
@@ -261,7 +319,8 @@ dimension <- as.numeric(args[3])
 size      <- as.numeric(args[4])
 nei  	  <- as.numeric(args[5])
 p    	  <- as.numeric(args[6])
-hubThreshold <- as.numeric(args[7]) # The threshold of the centrality score for determing a hub
+hubSTD <- as.numeric(args[7]) # The standard deviations away from the mean for 
+                              # determing a hub
 
 # Number of runs
 trialCount <- as.numeric(args[8])
@@ -280,6 +339,9 @@ for( i in seq(from=1, to= trialCount, by=1)){
   print(paste('mkdir ',name, sep=""))
   system(paste('mkdir ', name, sep=""))
   setwd(paste(name, sep=""))
+
+  system('mkdir DegreeData')
+
   print(getwd())
 
   #-----------------------------------------------
@@ -306,12 +368,12 @@ for( i in seq(from=1, to= trialCount, by=1)){
     
     # Run functions on Graphs
     # ------------------------
-    hubMatrix <- FindHubs(runCount, hubThreshold, swpGraph)
+    hubMatrix <- FindHubs(runCount, hubSTD, swpGraph)
    # CalcSws = CalcSws(swpGraph, randGraph)
     PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, dimension, size, nei, p,
-                    hubThreshold)
+                    hubSTD)
 
-    hubs_Model_run <- Run_Hubs_Model(runCount, swpGraph, randGraph, hubThreshold, 
+    hubs_Model_run <- Run_Hubs_Model(runCount, swpGraph, randGraph, hubSTD, 
                            timeSteps)
 
 
