@@ -22,8 +22,8 @@ if(modelNum == 2):
   modelType     = 'hubs1_make_model.r'
   modelTypeName = 'hubs1_'
 if(modelNum == 3):
-  modelType     = 'hubs1_make_model_ALLHUBS.r'
-  modelTypeName = 'hubs1_allHubs_'
+  modelType     = 'hubs2_make_model.r'
+  modelTypeName = 'hubs2_'
 if(modelNum == 4):
   modelType     = 'pathLength_make_model.r'
   modelTypeName = 'pathlength_'
@@ -46,8 +46,8 @@ sizeArray = [3]           # Size Values
 neiArray  = [1,]              # Neighbor values
 pArray    = [.15,.25,.35,.45]  # re-wiring prob. values
 threshold = float(sys.argv[2])                 # Hub Threshold value
-runs      = 20                 # Number of seed Runs
-steps     = 10000               # Number of steps per run
+runs      = 5                 # Number of seed Runs
+steps     = 500               # Number of steps per run
 
 runCount = 0
 # Loop through dimensions
