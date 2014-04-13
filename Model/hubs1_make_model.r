@@ -31,12 +31,23 @@ MakeRandNetwork <- function(dimension, size, nei, swpGraph){
 
 
 # Finds the hubs of a network.
-FindHubs <- function(runCount, hubThreshold, swpGraph){
-  hubScore  <- hub.score(swpGraph) 
-  hubValues <- hubScore$vector      # Takes just values from hub score
-  # Replaces all hubs with a 1, and other vertices with a 0.
-  hubMatrix <- replace(replace(hubValues,hubValues >= hubThreshold, 1),
-                              hubValues < hubThreshold,0)  
+FindHubs <- function(runCount, hubSTD, swpGraph){
+  # Finds the klienburg centrality hubs
+  # Based on the standard deviation of the mean of the hub score.
+
+  # hub score for each node
+  hubScore <- hub.score(swpGraph)
+  
+  h <- hubScore$vector
+  
+  hubThreshold  <- mean(h)+(hubSTD*(sd(h)))
+
+  # Replaces all hubs with a score above the threshold with a 1, and other
+  # verticies with a 0. This is a discrete hub list, as betweenness values are
+  # lost.
+  hubMatrix   <- replace(replace(h, h >= hubThreshold, 1), h < hubThreshold, 0)
+
+
   return(hubMatrix)
 }
 
@@ -105,7 +116,7 @@ HubHub <- function(swpGraph, hubs){
 ################################################################################
 
 # Run model that attacks the hubs first.
-Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold, 
+Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubSTD, 
                            timeSteps){
   
   # Initialzie Model Print Out files
@@ -122,13 +133,13 @@ Run_Hubs_Model <- function(runCount, swpGraph, randGraph, hubThreshold,
  # Returns a list of the vertex number of all the hubs. 
   for(step in seq(from=1, to=timeSteps, by=1)){
     # Swp Hubs
-    swpHubMatrix  <- FindHubs(runCount, hubThreshold, swpGraph)
+    swpHubMatrix  <- FindHubs(runCount, hubSTD, swpGraph)
     swpHubInd     <- (which(swpHubMatrix %in% 1))
     swpNonHubs    <- which(!(1:length(swpHubMatrix) %in% swpHubInd))
 
 print(vcount(swpGraph))
 print(ecount(swpGraph))
-    
+print(swpHubInd)    
     # SWP hub-hub connections
     hubhub  <- HubHub(swpGraph, swpHubInd)
     hubhub1 <- hubhub$hubhub1  # used for x
@@ -192,7 +203,7 @@ print(paste('step: ', step))
     # -------------------------------
     swsList <- CalcSws(swpGraph,randGraph)
     swpGamma  <-  transitivity(swpGraph, type="global", vids=NULL, weights=NULL)
-    write(paste(step,'\t',HubCounts(FindHubs(runCount, hubThreshold, swpGraph)),
+    write(paste(step,'\t',HubCounts(FindHubs(runCount, hubSTD, swpGraph)),
           '\t', swsList$Sws,'\t', swsList$swpPathLength,'\t',
           swsList$swpClustering,'\t', swsList$swpCC, '\t', swsList$Sws2 ),
           file= runLogOutput, append = TRUE, sep="," )
@@ -208,7 +219,7 @@ print(paste('step: ', step))
 ############################## Printing Functions ##############################
 ################################################################################
 PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dimension, size,
-                            nei, p, hubThreshold){
+                            nei, p, hubSTD){
   # Generate output file of each run in each run directory
   outfileName = "../cumulative_attributes.txt"   
     
@@ -219,7 +230,7 @@ PrintGraphStats <- function(runCount, swpGraph, randGraph, hubMatrix,dimension, 
     write(paste('Size: ',size), file= outfileName, append = TRUE, sep= ", ")
     write(paste('Nei: ', nei), file= outfileName, append = TRUE, sep= ", ")
     write(paste('p: ',p), file= outfileName, append = TRUE, sep= ", ")
-    write(paste('hubThreshold: ', hubThreshold), file= outfileName,
+    write(paste('hubSTD: ', hubSTD), file= outfileName,
           append = TRUE, sep= ", ")
     write(paste('swpGraph Vertice count: ', vcount(swpGraph)), file= outfileName,
           append = TRUE, sep= ", ")
@@ -311,7 +322,8 @@ dimension <- as.numeric(args[3])
 size      <- as.numeric(args[4])
 nei  	  <- as.numeric(args[5])
 p    	  <- as.numeric(args[6])
-hubThreshold <- as.numeric(args[7]) # The threshold of the centrality score for determing a hub
+hubSTD <- as.numeric(args[7]) # The standard deviations away from the mean for 
+                              # determing a hub
 
 # Number of runs
 trialCount <- as.numeric(args[8])
@@ -359,12 +371,12 @@ for( i in seq(from=1, to= trialCount, by=1)){
     
     # Run functions on Graphs
     # ------------------------
-    hubMatrix <- FindHubs(runCount, hubThreshold, swpGraph)
+    hubMatrix <- FindHubs(runCount, hubSTD, swpGraph)
    # CalcSws = CalcSws(swpGraph, randGraph)
     PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, dimension, size, nei, p,
-                    hubThreshold)
+                    hubSTD)
 
-    hubs_Model_run <- Run_Hubs_Model(runCount, swpGraph, randGraph, hubThreshold, 
+    hubs_Model_run <- Run_Hubs_Model(runCount, swpGraph, randGraph, hubSTD, 
                            timeSteps)
 
 
