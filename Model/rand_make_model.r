@@ -269,7 +269,7 @@ PrintDegreeDist <- function(swpGraph, runCount, step, timeSteps, degreeMax,
 
   # If last step
   if(step == timeSteps){
-    write(paste(degreeMax, probMax), sep="\n", file = "windowInfo.txt")
+    write(paste(degreeMax, probMax, sep="\n"), sep="\n", file = "windowInfo.txt")
   }
 
   setwd('../..')    # Back out of degree run directory
