@@ -12,7 +12,7 @@ do
 	then
 		# Enter Probability Dir
 		cd $probDir
-		echo $probDir
+		echo "Entering $probDir "
 
 		# Look for and enter Degree Data Dir
 		if [ -e "DegreeData" ]
@@ -30,10 +30,11 @@ do
 					# If plots folder exists, delete it, recursively.
 					if [ -e "plots" ]
 					then
+						echo "Removing $probDir/DegreeData/$degreeDistData Plots folder... "
 						rm -r plots
 						cd ..
 					else
-						echo 'Plots folder not contained in $probDir/DegreeData/$degreeDistData'
+						echo "Plots folder not contained in $probDir/DegreeData/$degreeDistData"
 						cd ..
 					fi
 				fi
