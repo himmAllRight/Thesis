@@ -1,0 +1,37 @@
+#!/bin/bash
+
+for probDir in *; do
+	if [ -d $probDir ]
+	then
+	# Enter Probability Dir
+	cd $top
+
+	# Look for and enter Degree Data Dir
+	if [ -e "DegreeData" ]
+		then
+		cd DegreeData
+
+		# enters each degreeDistDat folder
+		for degreeDistData in *degreeDistData; do
+			# If degreeDistData folder, enter
+			if [ -d $degreeDistData ]
+				then
+				cd $degreeDistData
+
+				# If plots folder exists, delete it, recursively.
+				if [ -e "plots" ]
+					then
+					rm -r plots
+				else
+					echo 'Plots folder not contained in $probDir/DegreeData/$degreeDistData'
+				fi
+			fi
+		done
+
+
+
+	 # If there is no DegreeData Dir	
+	else
+		echo "No DegreeData Directory"
+	fi
+done
