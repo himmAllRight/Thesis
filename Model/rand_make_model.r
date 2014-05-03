@@ -19,10 +19,10 @@ MakeSWPNetwork <- function(dimension,size,nei,p){
 }
 
 # Function to Generate an Erdos-Renyi random graph
-MakeRandNetwork <- function(dimension, size, nei, swpGraph){
+MakeRandNetwork <- function(nodeCount, edgeCount){
   # Try to make a random graph with the watts.strogatz.game function
 #  randGraph <- watts.strogatz.game(dimension,size,nei,1,loops = FALSE, multiple = FALSE)
-  randGraph <- erdos.renyi.game(vcount(swpGraph),ecount(swpGraph), type="gnm",
+  randGraph <- erdos.renyi.game(nodeCount, edgeCount, type="gnm",
                                directed = FALSE, loops = FALSE)
   return(randGraph)
 }
@@ -383,7 +383,8 @@ for( i in seq(from=1, to= trialCount, by=1)){
     
     # Make New Graphs
     swpGraph = MakeSWPNetwork(dimension,size,nei,p)
-    randGraph = MakeRandNetwork(dimension, size, nei, swpGraph)
+    randGraph <- MakeRandNetwork(vcount(swpGraph), ecount(swpGraph))
+    
 
     if(CalcSws(swpGraph, randGraph)$Sws > 1) notSWP=FALSE
     if(notSWPCount >= 1000){
