@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Place in top of an experiment folder (The one that contains all of the 
+# prob. sub folders). It will loop through the experiment and delete the 
+# degree distribution data plots folder in each param set that contains the
+# gif files used to create # the degree distribution animations. It won't 
+# delete the animations. They are in a seperate folder.
+
+for probDir in *; do
+	if [ -d $probDir ]
+	then
+	# Enter Probability Dir
+	cd $top
+
+	# Look for and enter Degree Data Dir
+	if [ -e "DegreeData" ]
+		then
+		cd DegreeData
+
+		# enters each degreeDistDat folder
+		for degreeDistData in *degreeDistData; do
+			# If degreeDistData folder, enter
+			if [ -d $degreeDistData ]
+				then
+				cd $degreeDistData
+
+				# If plots folder exists, delete it, recursively.
+				if [ -e "plots" ]
+					then
+					rm -r plots
+				else
+					echo 'Plots folder not contained in $probDir/DegreeData/$degreeDistData'
+				fi
+			fi
+		done
+
+
+
+	 # If there is no DegreeData Dir	
+	else
+		echo "No DegreeData Directory"
+	fi
+ done
