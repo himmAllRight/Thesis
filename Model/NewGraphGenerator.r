@@ -27,12 +27,12 @@ generateGraph <- function(dim, size, nei, p, n, d){
 
   # Connect all subgraphs to each other
   # each subgraph
-  for(i in seq(from=1, to= n, by=1)){
+  for(i in seq(from=1, to= n-1, by=1)){
     # Link to each proceding sub-graph
-    k =
+    
 
-    for( j in seq(from=i+1, to= n, by=1)){
       
+      for(j in seq(from=(i + 1), to= n, by=1)){
 
       x <- sample( (((i-1)*gL)+1):(i*gL) ,1)
       y <- sample( (((j-1)*gL)+1):(j*gL) ,1)
