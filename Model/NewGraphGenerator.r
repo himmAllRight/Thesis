@@ -31,17 +31,18 @@ generateGraph <- function(dim, size, nei, p, n, d){
     # Link to each proceding sub-graph
     
 
-      
+      # For each other subgraph connection
       for(j in seq(from=(i + 1), to= n, by=1)){
+        for(k in seq(from= 1, to= d, by=1)){
+          x <- sample( (((i-1)*gL)+1):(i*gL) ,1)
+          y <- sample( (((j-1)*gL)+1):(j*gL) ,1)
 
-      x <- sample( (((i-1)*gL)+1):(i*gL) ,1)
-      y <- sample( (((j-1)*gL)+1):(j*gL) ,1)
+          print(x)
+          print(y)
 
-      print(x)
-      print(y)
-
-      G[x,y] <- TRUE
-    }
+          G[x,y] <- TRUE
+        }
+      }
 
   }
 
@@ -74,7 +75,7 @@ p         <- as.numeric(args[4])
 
 # Group / Link parameters
 n         <- 5
-d         <- 100
+d         <- 1
 
 
 # Executable Code
