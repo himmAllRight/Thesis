@@ -5,7 +5,7 @@ library(igraph)
 
 #
 
-generateGraph <- function(dim, size, nei, p, n, d){
+MakeClusterGraph <- function(dim, size, nei, p, n, d){
 
   # Initial Swp Graph to make cumulative Swp
   G <- watts.strogatz.game(dim, size, nei, p)
@@ -80,7 +80,7 @@ d         <- 1
 
 # Executable Code
 
-run <- generateGraph(dimension, size, nei, p, n, d)
+run <- MakeClusterGraph(dimension, size, nei, p, n, d)
 
 
 #plot Graph
