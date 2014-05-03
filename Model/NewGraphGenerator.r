@@ -5,7 +5,7 @@ library(igraph)
 
 #
 
-generateGraph <- function(dim, size, nei, p, d){
+generateGraph <- function(dim, size, nei, p, n, d){
 
   # Initial Swp Graph to make cumulative Swp
   G <- watts.strogatz.game(dim, size, nei, p)
@@ -13,7 +13,7 @@ generateGraph <- function(dim, size, nei, p, d){
   print("Initial G generation")
   print(paste("G nodes: ", vcount(G),"   G edges: ", ecount(G)))
 
-  for (step in seq(from=1, to=(d - 1), by=1)){
+  for (i in seq(from=1, to=(n - 1), by=1)){
     g <- watts.strogatz.game(dim, size, nei, p)
 
     G <- G + g
@@ -22,8 +22,23 @@ generateGraph <- function(dim, size, nei, p, d){
     print(paste("G nodes: ", vcount(G),"   G edges: ", ecount(G)))
   }
 
-  plot(G)
+  # connect components
+  gL <- vcount(g)
 
+  # Connect to each subgraph
+  for(i in seq(from=1, to=(n-1), by=1)){
+    # for each d
+    for(j in seq(from=1, to=d, by=1)){
+      x <- sample(1:gL,1)
+      y <- sample(((gL*i)+1):(gL*(i+1)),1)
+
+      G[x,y] <- TRUE
+    }
+
+  }
+
+
+  return(G)
 }
 
 
@@ -37,9 +52,15 @@ nei       <- as.numeric(args[3])
 p         <- as.numeric(args[4])
 
 # Group / Link parameters
-d         <- 5
+n         <- 5
+d         <- 10
 
 
 # Executable Code
 
-run <- generateGraph(dimension, size, nei, p, d)
+run <- generateGraph(dimension, size, nei, p, n, d)
+
+
+#plot Graph
+png(file="testGraphGen.png")
+plot(run)
