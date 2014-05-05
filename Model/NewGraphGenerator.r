@@ -5,7 +5,7 @@ library(igraph)
 
 #
 
-generateGraph <- function(dim, size, nei, p, n, d){
+MakeClusterGraph <- function(dim, size, nei, p, n, d){
 
   # Initial Swp Graph to make cumulative Swp
   G <- watts.strogatz.game(dim, size, nei, p)
@@ -27,21 +27,22 @@ generateGraph <- function(dim, size, nei, p, n, d){
 
   # Connect all subgraphs to each other
   # each subgraph
-  for(i in seq(from=1, to= n, by=1)){
+  for(i in seq(from=1, to= n-1, by=1)){
     # Link to each proceding sub-graph
-    k =
+    
 
-    for( j in seq(from=i+1, to= n, by=1)){
-      
+      # For each other subgraph connection
+      for(j in seq(from=(i + 1), to= n, by=1)){
+        for(k in seq(from= 1, to= d, by=1)){
+          x <- sample( (((i-1)*gL)+1):(i*gL) ,1)
+          y <- sample( (((j-1)*gL)+1):(j*gL) ,1)
 
-      x <- sample( (((i-1)*gL)+1):(i*gL) ,1)
-      y <- sample( (((j-1)*gL)+1):(j*gL) ,1)
+          print(x)
+          print(y)
 
-      print(x)
-      print(y)
-
-      G[x,y] <- TRUE
-    }
+          G[x,y] <- TRUE
+        }
+      }
 
   }
 
@@ -74,12 +75,12 @@ p         <- as.numeric(args[4])
 
 # Group / Link parameters
 n         <- 5
-d         <- 100
+d         <- 1
 
 
 # Executable Code
 
-run <- generateGraph(dimension, size, nei, p, n, d)
+run <- MakeClusterGraph(dimension, size, nei, p, n, d)
 
 
 #plot Graph

@@ -21,14 +21,71 @@ MakeSWPNetwork <- function(dimension,size,nei,p){
 }
 
 # Function to Generate an Erdos-Renyi random graph
-MakeRandNetwork <- function(dimension, size, nei, swpGraph){
+MakeRandNetwork <- function(nodeCount, edgeCount){
   # Try to make a random graph with the watts.strogatz.game function
-  #randGraph <- watts.strogatz.game(dimension,size,nei,1,loops = FALSE, multiple = FALSE)
-  randGraph <- erdos.renyi.game(vcount(swpGraph),ecount(swpGraph), type="gnm",
+#  randGraph <- watts.strogatz.game(dimension,size,nei,1,loops = FALSE, multiple = FALSE)
+  randGraph <- erdos.renyi.game(nodeCount, edgeCount, type="gnm",
                                directed = FALSE, loops = FALSE)
   return(randGraph)
 }
 
+MakeClusterGraph <- function(dim, size, nei, p, n, d){
+
+  # Initial Swp Graph to make cumulative Swp
+  G <- watts.strogatz.game(dim, size, nei, p)
+
+  print("Initial G generation")
+  print(paste("G nodes: ", vcount(G),"   G edges: ", ecount(G)))
+
+  for (i in seq(from=1, to=(n - 1), by=1)){
+    g <- watts.strogatz.game(dim, size, nei, p)
+
+    G <- G + g
+
+    print("G after addition")
+    print(paste("G nodes: ", vcount(G),"   G edges: ", ecount(G)))
+  }
+
+  # connect components
+  gL <- vcount(g)
+
+  # Connect all subgraphs to each other
+  # each subgraph
+  for(i in seq(from=1, to= n-1, by=1)){
+    # Link to each proceding sub-graph
+    
+
+      # For each other subgraph connection
+      for(j in seq(from=(i + 1), to= n, by=1)){
+        for(k in seq(from= 1, to= d, by=1)){
+          x <- sample( (((i-1)*gL)+1):(i*gL) ,1)
+          y <- sample( (((j-1)*gL)+1):(j*gL) ,1)
+
+          print(x)
+          print(y)
+
+          G[x,y] <- TRUE
+        }
+      }
+
+  }
+
+
+  # Connect each subgraph to first subgraph
+  # for(i in seq(from=1, to=(n-1), by=1)){
+  #   # for each d
+  #   for(j in seq(from=1, to=d, by=1)){
+  #     x <- sample(1:gL,1)
+  #     y <- sample(((gL*i)+1):(gL*(i+1)),1)
+
+  #     G[x,y] <- TRUE
+  #   }
+
+  # }
+
+
+  return(G)
+}
 
 # Finds the hubs of a network.
 FindHubs <- function(runCount, hubSTD, swpGraph){
@@ -357,7 +414,7 @@ for( i in seq(from=1, to= trialCount, by=1)){
     notSWPCount <- notSWPCount + 1
     print(notSWPCount)
     swpGraph <- MakeSWPNetwork(dimension,size,nei,p)
-    randGraph <- MakeRandNetwork(dimension, size, nei, swpGraph)
+    randGraph <- MakeRandNetwork(vcount(swpGraph), ecount(swpGraph))
     if(CalcSws(swpGraph, randGraph)$Sws > 1) notSWP <- FALSE
     if(notSWPCount >= 1000){
 	    write(paste('Could not generate SWP graph in ', notSWPCount, 
