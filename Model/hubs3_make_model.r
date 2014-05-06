@@ -417,7 +417,8 @@ for( i in seq(from=1, to= trialCount, by=1)){
     print("redo")
     notSWPCount <- notSWPCount + 1
     print(notSWPCount)
-    swpGraph <- MakeSWPNetwork(dimension,size,nei,p)
+    swpGraph  <- MakeClusterGraph(dimension, size, nei, p, n, d)
+    #swpGraph  <- MakeSWPNetwork(dimension,size,nei,p)
     randGraph <- MakeRandNetwork(vcount(swpGraph), ecount(swpGraph))
     if(CalcSws(swpGraph, randGraph)$Sws > 1) notSWP <- FALSE
     if(notSWPCount >= 1000){

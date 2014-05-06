@@ -386,7 +386,8 @@ for( i in seq(from=1, to= trialCount, by=1)){
     print(notSWPCount) # Print re-gen number
     
     # Make New Graphs
-    swpGraph = MakeSWPNetwork(dimension,size,nei,p)
+    swpGraph  <- MakeClusterGraph(dimension, size, nei, p, n, d)
+    #swpGraph  <- MakeSWPNetwork(dimension,size,nei,p)
     randGraph <- MakeRandNetwork(vcount(swpGraph), ecount(swpGraph))
     
 
