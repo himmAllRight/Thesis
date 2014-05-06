@@ -383,6 +383,10 @@ hubSTD <- as.numeric(args[7]) # The standard deviations away from the mean for
 trialCount <- as.numeric(args[8])
 timeSteps  <- as.numeric(args[9])
 
+# Params for Clustering Graphs
+n <- 10  # Number of Sub Graphs
+d <- 2   # Number of edges to connect each sub-graph
+
 setwd(topFolder)
 
 
