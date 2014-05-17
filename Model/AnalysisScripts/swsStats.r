@@ -52,7 +52,7 @@ for(paramSet in paramList){
   	Sws2B		<- c(Sws2B, mean(dataMatrix[,7][((totalSteps - windowSize)+1):totalSteps]))
 
   	pathLengthA	<- c(pathLengthA, mean(dataMatrix[,4][1:windowSize]))
-  	pathLengthB	<- c(pathLengthA, mean(dataMatrix[,4][((totalSteps - windowSize)+1):totalSteps]))
+  	pathLengthB	<- c(pathLengthB, mean(dataMatrix[,4][((totalSteps - windowSize)+1):totalSteps]))
 
   	ccA		<- c(ccA, mean(dataMatrix[,6][1:windowSize]))
   	ccB		<- c(ccB, mean(dataMatrix[,6][((totalSteps - windowSize)+1):totalSteps]))
