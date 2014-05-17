@@ -44,9 +44,18 @@ for(paramSet in paramList){
 
   	dataMatrix  <- MakeDataMatrix(run)
 
-  	# Add new data to cumulative Hubs Lists
+  	# Add new data cumulative lists
   	hubCountsA	<- c(hubCountsA, dataMatrix[,2][1:windowSize])
   	hubCountsB	<- c(hubCountsB, dataMatrix[,2][((totalSteps - windowSize)+1):totalSteps])
+
+  	Sws2A		<- c(Sws2A, dataMatrix[,7][1:windowSize])
+  	Sws2B		<- c(Sws2B, dataMatrix[,7][((totalSteps - windowSize)+1):totalSteps])
+
+  	pathLengthA	<- c(pathLengthA, dataMatrix[,4][1:windowSize])
+  	pathLengthB	<- c(pathLengthA, dataMatrix[,4][((totalSteps - windowSize)+1):totalSteps])
+
+  	ccA		<- c(ccA, dataMatrix[,6][1:windowSize])
+  	ccB		<- c(ccB, dataMatrix[,6][((totalSteps - windowSize)+1):totalSteps])
 
   	#print(dataMatrix[,2][1:windowSize])
   	#print(dataMatrix[,2][((totalSteps - windowSize)+1):totalSteps])
