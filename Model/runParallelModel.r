@@ -15,15 +15,15 @@ runs 		        <- 30
 steps		        <- 5000
 
 # Builds a table of the parameter List
-paramList <- list(dimArray, sizeArray, neiArray, pArray, thresholdArray, nArray, dArray)
+paramList <- expand.grid(list(dim = dimArray, size= sizeArray, nei= neiArray, p= pArray, threshold= thresholdArray, n= nArray, d= dArray))
 
 
 # Now I just have to figure out how to traverse it by each set...
-i= 0
-for(paramSet in paramList){
-  print(i)
+print(nrow(paramList[1]))
+
+for(i in 1:nrow(paramList[1])){
+  paramSet <- paramList[i,]
   print(paramSet)
-  i = i + 1
 }
 
 
