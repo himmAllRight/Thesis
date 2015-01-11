@@ -1,6 +1,6 @@
 \name{MakeRandNetwork}
 \alias{MakeRandNetwork}
-\title{Makes a random netowrk.
+\title{Makes a random netowrk.}
 \description{Makes a random network using the erdos.renyi.game igraph function.}
 \usage{
 MakeRandNetwork(nodeCount, edgeCount)

@@ -6,4 +6,5 @@ Date: 2015-01-08
 Author: Ryan Himmelwright
 Maintainer: Ryan Himmelwright <ryan.himmelwright@gmail.com>
 Description: Contains all the functions used in Ryan Himmelwright's 2014 Honors Thesis at Lafayette College.
+Depends: igraph
 License: GPL 2
