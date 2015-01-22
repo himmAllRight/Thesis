@@ -1,0 +1,60 @@
+runCount:  1
+seedVale:  29990
+dimension:  4
+Size:  3
+Nei:  1
+p:  0.25
+hubSTD:  1
+swpGraph Vertice count:  810
+swpGraph Edge count:  3330
+swpGraph Sws:  6.47847819345213
+swpGraph Hub count:  91
+
+runCount:  2
+seedVale:  29990
+dimension:  4
+Size:  3
+Nei:  1
+p:  0.25
+hubSTD:  1
+swpGraph Vertice count:  810
+swpGraph Edge count:  3330
+swpGraph Sws:  6.6733719123074
+swpGraph Hub count:  87
+
+runCount:  3
+seedVale:  29990
+dimension:  4
+Size:  3
+Nei:  1
+p:  0.25
+hubSTD:  1
+swpGraph Vertice count:  810
+swpGraph Edge count:  3330
+swpGraph Sws:  7.506097876897
+swpGraph Hub count:  92
+
+runCount:  4
+seedVale:  29990
+dimension:  4
+Size:  3
+Nei:  1
+p:  0.25
+hubSTD:  1
+swpGraph Vertice count:  810
+swpGraph Edge count:  3330
+swpGraph Sws:  5.16573016188437
+swpGraph Hub count:  92
+
+runCount:  5
+seedVale:  29990
+dimension:  4
+Size:  3
+Nei:  1
+p:  0.25
+hubSTD:  1
+swpGraph Vertice count:  810
+swpGraph Edge count:  3330
+swpGraph Sws:  7.40066343244727
+swpGraph Hub count:  91
+

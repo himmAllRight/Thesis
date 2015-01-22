@@ -1,0 +1,12 @@
+runCount:  1
+seedVale:  31358
+dimension:  4
+Size:  3
+Nei:  1
+p:  0.15
+hubSTD:  1
+swpGraph Vertice count:  810
+swpGraph Edge count:  3330
+swpGraph Sws:  7.34453118999322
+swpGraph Hub count:  106
+

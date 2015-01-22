@@ -47,10 +47,10 @@ os.system(makeTopFolder)
 dimArray  = [4]            # Dimension Values
 sizeArray = [3]           # Size Values
 neiArray  = [1,]              # Neighbor values
-pArray    = [.15,.25,.35,.45]  # re-wiring prob. values
+pArray    = [.25]  # re-wiring prob. values
 threshold = float(sys.argv[2])                 # Hub Threshold value
-runs      = 30                 # Number of seed Runs
-steps     = 2500               # Number of steps per run
+runs      = 5                 # Number of seed Runs
+steps     = 1000               # Number of steps per run
 
 runCount = 0
 # Loop through dimensions

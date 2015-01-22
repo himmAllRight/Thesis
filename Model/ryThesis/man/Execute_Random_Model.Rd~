@@ -1,0 +1,129 @@
+\name{Execute_Random_Model}
+\alias{Execute_Random_Model}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{
+%%  ~~function to do ... ~~
+}
+\description{
+%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+}
+\usage{
+Execute_Random_Model(topFolder, name, dimension, size, nei, p, hubThreshold, trialCount, timesteps, n = 10, d = 2)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{topFolder}{
+%%     ~~Describe \code{topFolder} here~~
+}
+  \item{name}{
+%%     ~~Describe \code{name} here~~
+}
+  \item{dimension}{
+%%     ~~Describe \code{dimension} here~~
+}
+  \item{size}{
+%%     ~~Describe \code{size} here~~
+}
+  \item{nei}{
+%%     ~~Describe \code{nei} here~~
+}
+  \item{p}{
+%%     ~~Describe \code{p} here~~
+}
+  \item{hubThreshold}{
+%%     ~~Describe \code{hubThreshold} here~~
+}
+  \item{trialCount}{
+%%     ~~Describe \code{trialCount} here~~
+}
+  \item{timesteps}{
+%%     ~~Describe \code{timesteps} here~~
+}
+  \item{n}{
+%%     ~~Describe \code{n} here~~
+}
+  \item{d}{
+%%     ~~Describe \code{d} here~~
+}
+}
+\details{
+%%  ~~ If necessary, more details than the description above ~~
+}
+\value{
+%%  ~Describe the value returned
+%%  If it is a LIST, use
+%%  \item{comp1 }{Description of 'comp1'}
+%%  \item{comp2 }{Description of 'comp2'}
+%% ...
+}
+\references{
+%% ~put references to the literature/web site here ~
+}
+\author{
+%%  ~~who you are~~
+}
+\note{
+%%  ~~further notes~~
+}
+
+%% ~Make other sections like Warning with \section{Warning }{....} ~
+
+\seealso{
+%% ~~objects to See Also as \code{\link{help}}, ~~~
+}
+\examples{
+##---- Should be DIRECTLY executable !! ----
+##-- ==>  Define data, use random,
+##--	or do  help(data=index)  for the standard data sets.
+
+## The function is currently defined as
+function (topFolder, name, dimension, size, nei, p, hubThreshold, 
+    trialCount, timesteps, n = 10, d = 2) 
+{
+    setwd(topFolder)
+    runCount = 1
+    for (i in seq(from = 1, to = trialCount, by = 1)) {
+        print(getwd())
+        print(paste("mkdir ", name, sep = ""))
+        system(paste("mkdir ", name, sep = ""))
+        setwd(paste(name, sep = ""))
+        system("mkdir DegreeData")
+        print(getwd())
+        notSWP = TRUE
+        notSWPCount = 0
+        while (notSWP) {
+            print("redo")
+            notSWPCount = notSWPCount + 1
+            print(notSWPCount)
+            swpGraph <- MakeClusterGraph(dimension, size, nei, 
+                p, n, d)
+            randGraph <- MakeRandNetwork(vcount(swpGraph), ecount(swpGraph))
+            if (CalcSws(swpGraph, randGraph)$Sws > 1) 
+                notSWP = FALSE
+            if (notSWPCount >= 1000) {
+                write(paste("Could not generate SWP graph in ", 
+                  notSWPCount, " tries."), file = "failed.txt", 
+                  append = TRUE, sep = ", ")
+                quit(save = "no")
+            }
+        }
+        print("Start steps")
+        hubMatrix = FindHubs(runCount, hubThreshold, swpGraph)
+        PrintGraphStats(runCount, swpGraph, randGraph, hubMatrix, 
+            dimension, size, nei, p, hubThreshold)
+        rand_Model_Run = Run_Random_Model(runCount, swpGraph, 
+            randGraph, hubMatrix, timeSteps)
+        runCount = runCount + 1
+        if (runCount >= trialCount) {
+            system("mkdir DegreeLogs")
+            system("mv *_DegreeLog.txt DegreeLogs")
+        }
+        setwd("..")
+    }
+    print(warnings())
+  }
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{ ~kwd1 }
+\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

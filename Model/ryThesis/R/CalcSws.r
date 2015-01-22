@@ -1,3 +1,4 @@
+library(igraph)
 # Calculates S^WS for the network.
 CalcSws <- function(swpGraph, randGraph){
   # Calculates clustering coefficients of swp and rand graphs

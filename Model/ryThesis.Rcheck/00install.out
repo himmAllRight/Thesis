@@ -1,0 +1,9 @@
+* installing *source* package ‘ryThesis’ ...
+** R
+Error in parse(outFile) : 
+  /Data1/ryan/Documents/Thesis/Thesis/Model/ryThesis/R/Run_Random_Model.r:78:0: unexpected end of input
+76: }
+77: 
+   ^
+ERROR: unable to collate and parse R files for package ‘ryThesis’
+* removing ‘/Data1/ryan/Documents/Thesis/Thesis/Model/ryThesis.Rcheck/ryThesis’

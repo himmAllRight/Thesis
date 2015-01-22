@@ -35,8 +35,8 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
       }else{
         pickXY <- FALSE
         y <- sample(possibleY, 1)
-       } 
-      }
+      } 
+    }
     swpGraph[x,y]    <- FALSE              # Remove edge between x and y
     # Selects new z values that don't have an edge with x.
     z  <- sample(which(!(1:vcount(swpGraph) %in% xNeighbors)), 1)
@@ -67,11 +67,11 @@ Run_Random_Model <- function(runCount, swpGraph, randGraph,  hubMatrix,
           file= runLogOutput, append = TRUE, sep="," )
 
 
-
     # Print Degree Data
     PrintDegree(swpGraph, runCount, step)
     # Print Degree Distrribution Data
     PrintDegreeDist(swpGraph, runCount, step, timeSteps, degreeMax, probMax)
 
-    }
+  }
 }
+
