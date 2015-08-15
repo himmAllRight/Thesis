@@ -1,4 +1,0 @@
-#!/bin/bash
-
-# Pushes the Thesis Directory to the AEC Computers
-rsync -avzu --delete --progress ~/Documents/Thesis/ himmelwr@compute217.cs.lafayette.edu:~/Documents/Thesis/
